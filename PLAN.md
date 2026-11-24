@@ -62,7 +62,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv run pytest tests/test_config_flow.py tests/test_notify.py`
   - Files: `config_flow.py`, `notify.py`, `services.yaml`, `strings.json`, `tests/test_notify.py`
 
-- [ ] **T6. 인증 상태 binary_sensor**
+- [x] **T6. 인증 상태 binary_sensor**
   - Acceptance: 수신자 device마다 `binary_sensor`(device_class 없음, 이름 "인증됨"), coordinator 데이터와 매핑, 인증 정보 없으면 unavailable.
   - Verify: `uv run pytest tests/test_binary_sensor.py`
   - Files: `binary_sensor.py`, `__init__.py`, `strings.json`, `tests/test_binary_sensor.py`

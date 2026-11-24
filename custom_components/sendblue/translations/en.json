@@ -165,5 +165,12 @@
         }
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {
+      "verified": {
+        "name": "Verified"
+      }
+    }
   }
 }

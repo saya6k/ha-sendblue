@@ -24,7 +24,7 @@ from .const import (
 )
 from .coordinator import SendblueCoordinator
 
-PLATFORMS: list[Platform] = [Platform.NOTIFY]
+PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.NOTIFY]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
