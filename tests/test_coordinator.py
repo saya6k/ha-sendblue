@@ -7,7 +7,7 @@ from homeassistant.helpers import issue_registry as ir
 from custom_components.sendblue.api import BASE_URL
 from custom_components.sendblue.const import CONF_LAST_LINE, DOMAIN
 
-from .conftest import LINE, MOM
+from .conftest import LINE, MOM, mock_webhooks
 
 
 async def test_refresh_exposes_line_and_verification(
@@ -54,6 +54,7 @@ async def test_contacts_failure_keeps_entry_working(
 ) -> None:
     aioclient_mock.get(f"{BASE_URL}/api/lines", json={"numbers": [LINE]})
     aioclient_mock.get(f"{BASE_URL}/accounts/shared-contacts", status=404, json={})
+    mock_webhooks(aioclient_mock)
     mock_entry.add_to_hass(hass)
 
     await hass.config_entries.async_setup(mock_entry.entry_id)

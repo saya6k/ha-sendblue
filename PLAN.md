@@ -71,7 +71,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
 
 ### Phase C — 수신·Assist
 
-- [ ] **T7. Webhook 등록 수명주기**
+- [x] **T7. Webhook 등록 수명주기**
   - Acceptance: setup 시 HA webhook 등록 + Sendblue에 URL 없으면 `add_webhook`(이미 있으면 생략). 실패 시 repair issue만 띄우고 setup은 성공. unload 시 HA webhook 해제. `async_remove_entry`에서 Sendblue `delete_webhook`. reconfigure로 URL이 바뀌면 이전 URL 삭제 후 새 URL 등록.
   - Verify: `uv run pytest tests/test_init.py`
   - Files: `__init__.py`, `webhook.py`(등록 함수), `strings.json`, `tests/test_init.py`

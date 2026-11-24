@@ -41,6 +41,7 @@ from .const import (
     SUBENTRY_RECIPIENT,
 )
 from .phone import normalize_address
+from .webhook import async_delete_remote_webhook
 
 _PASSWORD = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 _URL = TextSelector(TextSelectorConfig(type=TextSelectorType.URL))
@@ -153,6 +154,10 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
             if url is None:
                 errors[CONF_WEBHOOK_BASE_URL] = "invalid_url"
             else:
+                old_url = entry.data[CONF_WEBHOOK_BASE_URL]
+                if url != old_url:
+                    # Setup after the reload registers the new URL.
+                    await async_delete_remote_webhook(self.hass, entry, old_url)
                 return self.async_update_reload_and_abort(
                     entry, data_updates={CONF_WEBHOOK_BASE_URL: url}
                 )

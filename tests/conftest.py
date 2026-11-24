@@ -50,9 +50,23 @@ def mock_entry(mom_subentry: ConfigSubentryData) -> MockConfigEntry:
     )
 
 
+WEBHOOKS_URL = f"{BASE_URL}/api/account/webhooks"
+
+
+def mock_webhooks(aioclient_mock, existing: list[str] | None = None) -> None:
+    """Accept webhook list/add/delete calls."""
+    aioclient_mock.get(
+        WEBHOOKS_URL,
+        json={"status": "OK", "webhooks": {"receive": existing or []}},
+    )
+    aioclient_mock.post(WEBHOOKS_URL, json={"status": "OK"})
+    aioclient_mock.delete(WEBHOOKS_URL, json={"status": "OK"})
+
+
 @pytest.fixture
 def mock_api(aioclient_mock):
-    """Default healthy Sendblue responses; tests override with clear_requests()."""
+    """Healthy Sendblue responses for a full entry setup."""
+    mock_webhooks(aioclient_mock)
     aioclient_mock.get(f"{BASE_URL}/api/lines", json={"numbers": [LINE]})
     aioclient_mock.get(
         f"{BASE_URL}/accounts/shared-contacts",

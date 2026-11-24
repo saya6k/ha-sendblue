@@ -5,7 +5,7 @@ from homeassistant.core import HomeAssistant
 
 from custom_components.sendblue.api import BASE_URL
 
-from .conftest import LINE, MOM
+from .conftest import LINE, MOM, mock_webhooks
 
 ENTITY_ID = "binary_sensor.mom_verified"
 
@@ -13,6 +13,7 @@ ENTITY_ID = "binary_sensor.mom_verified"
 async def _setup(hass: HomeAssistant, entry, aioclient_mock, contacts) -> None:
     aioclient_mock.get(f"{BASE_URL}/api/lines", json={"numbers": [LINE]})
     aioclient_mock.get(f"{BASE_URL}/accounts/shared-contacts", **contacts)
+    mock_webhooks(aioclient_mock)
     entry.add_to_hass(hass)
     await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()

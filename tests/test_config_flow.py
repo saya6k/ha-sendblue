@@ -177,7 +177,12 @@ async def test_reauth_updates_credentials(hass: HomeAssistant, get_lines) -> Non
     assert entry.data[CONF_WEBHOOK_ID] == "hook"
 
 
-async def test_reconfigure_updates_webhook_base_url(hass: HomeAssistant) -> None:
+async def test_reconfigure_updates_webhook_base_url(
+    hass: HomeAssistant, aioclient_mock
+) -> None:
+    aioclient_mock.delete(
+        "https://api.sendblue.com/api/account/webhooks", json={"status": "OK"}
+    )
     entry = _entry()
     entry.add_to_hass(hass)
     result = await entry.start_reconfigure_flow(hass)
@@ -194,6 +199,41 @@ async def test_reconfigure_updates_webhook_base_url(hass: HomeAssistant) -> None
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
     assert entry.data[CONF_WEBHOOK_BASE_URL] == "https://new.example.com"
+    assert [c[2] for c in aioclient_mock.mock_calls if c[0].lower() == "delete"] == [
+        {"webhooks": ["https://ha.example.com/api/webhook/hook"], "type": "receive"}
+    ]
+
+
+async def test_reconfigure_continues_when_old_webhook_cannot_be_deleted(
+    hass: HomeAssistant, aioclient_mock
+) -> None:
+    aioclient_mock.delete(
+        "https://api.sendblue.com/api/account/webhooks", status=500, json={}
+    )
+    entry = _entry()
+    entry.add_to_hass(hass)
+    result = await entry.start_reconfigure_flow(hass)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_WEBHOOK_BASE_URL: "https://new.example.com"}
+    )
+
+    assert result["reason"] == "reconfigure_successful"
+
+
+async def test_reconfigure_with_same_url_keeps_webhook(
+    hass: HomeAssistant, aioclient_mock
+) -> None:
+    entry = _entry()
+    entry.add_to_hass(hass)
+    result = await entry.start_reconfigure_flow(hass)
+
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_WEBHOOK_BASE_URL: "https://ha.example.com"}
+    )
+
+    assert result["reason"] == "reconfigure_successful"
+    assert aioclient_mock.mock_calls == []
 
 
 async def test_options_flow_sets_conversation_agent(hass: HomeAssistant) -> None:

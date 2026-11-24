@@ -18,11 +18,17 @@ from .const import (
     ATTR_SEND_STYLE,
     CONF_API_KEY_ID,
     CONF_API_SECRET_KEY,
+    CONF_WEBHOOK_BASE_URL,
     DOMAIN,
     SEND_STYLES,
     SERVICE_SEND_MESSAGE,
 )
 from .coordinator import SendblueCoordinator
+from .webhook import (
+    async_delete_remote_webhook,
+    async_setup_webhook,
+    async_unload_webhook,
+)
 
 PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.NOTIFY]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
@@ -66,8 +72,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: SendblueConfigEntry) -> 
     await coordinator.async_config_entry_first_refresh()
     entry.runtime_data = SendblueRuntimeData(client=client, coordinator=coordinator)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    await async_setup_webhook(hass, entry)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: SendblueConfigEntry) -> bool:
+    async_unload_webhook(hass, entry)
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: SendblueConfigEntry) -> None:
+    await async_delete_remote_webhook(hass, entry, entry.data[CONF_WEBHOOK_BASE_URL])
