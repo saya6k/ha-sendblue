@@ -38,7 +38,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv run pytest tests/test_phone.py`
   - Files: `custom_components/sendblue/phone.py`, `tests/test_phone.py`
 
-- [ ] **T2. Sendblue API 클라이언트**
+- [x] **T2. Sendblue API 클라이언트**
   - Acceptance: `SendblueClient` — `get_lines`, `send_message`, `list_webhooks`, `add_webhook`, `delete_webhook`, `get_shared_contacts`. 예외: `SendblueAuthError`(401/403), `SendblueContactNotVerified`(`ContactHasNotBeenVerified`), `SendblueRateLimited`(429, 4001, 5509), `SendblueFreePlanLimit`(4007–4009), `SendblueError`. secret은 예외 메시지·repr에 포함 안 됨.
   - Verify: `uv run pytest tests/test_api.py` (`aioclient_mock`으로 헤더·본문·오류 매핑)
   - Files: `custom_components/sendblue/api.py`, `tests/test_api.py`
