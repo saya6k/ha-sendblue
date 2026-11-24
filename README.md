@@ -18,7 +18,7 @@ Send iMessages from Home Assistant to your family through [Sendblue](https://sen
 
 ## Install
 
-1. In HACS, open **Custom repositories**, add `https://github.com/saya6k/hacs-sendblue` as an **Integration**, then install **Sendblue**.
+1. In HACS, open **Custom repositories**, add `https://github.com/saya6k/ha-sendblue` as an **Integration**, then install **Sendblue**.
 2. Restart Home Assistant.
 
 ## Set up Sendblue

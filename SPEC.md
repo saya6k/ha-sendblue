@@ -159,7 +159,7 @@ uv run ruff check --fix . && uv run ruff format .
 수동 E2E (HA OS):
 
 ```text
-HACS → Custom repositories → https://github.com/saya6k/hacs-sendblue (Integration) → 설치 → HA 재시작
+HACS → Custom repositories → https://github.com/saya6k/ha-sendblue (Integration) → 설치 → HA 재시작
 설정 → 기기 및 서비스 → 통합구성요소 추가 → Sendblue
 ```
 

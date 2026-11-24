@@ -18,7 +18,7 @@
 
 ## 설치
 
-1. HACS → **사용자 지정 저장소**에 `https://github.com/saya6k/hacs-sendblue`를 **통합구성요소**로 추가하고 **Sendblue**를 설치합니다.
+1. HACS → **사용자 지정 저장소**에 `https://github.com/saya6k/ha-sendblue`를 **통합구성요소**로 추가하고 **Sendblue**를 설치합니다.
 2. Home Assistant를 재시작합니다.
 
 ## Sendblue 설정

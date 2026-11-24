@@ -1,4 +1,4 @@
-# Implementation Plan: hacs-sendblue
+# Implementation Plan: ha-sendblue
 
 근거: [SPEC.md](SPEC.md). 각 작업은 테스트를 먼저 쓰고(TDD), 작업 하나당 커밋 하나. 모든 작업의 공통 검증은 `uv run pytest && uv run ruff check . && uv run ruff format --check .`.
 

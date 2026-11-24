@@ -12,10 +12,10 @@
     "conversation",
     "webhook"
   ],
-  "documentation": "https://github.com/saya6k/hacs-sendblue",
+  "documentation": "https://github.com/saya6k/ha-sendblue",
   "integration_type": "service",
   "iot_class": "cloud_push",
-  "issue_tracker": "https://github.com/saya6k/hacs-sendblue/issues",
+  "issue_tracker": "https://github.com/saya6k/ha-sendblue/issues",
   "requirements": [],
   "version": "0.1.0"
 }
