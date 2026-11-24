@@ -68,7 +68,7 @@ HA 자동화에서 가족에게 iMessage(불가 시 SMS)로 알림을 보내고,
 - 수신 iPhone에 푸시 알림 정상 표시 (공유 번호가 발신자라 본인 번호를 수신자로 써도 알림이 뜬다).
 - 발송된 메시지에 일반 답장 → 같은 webhook으로 수신 (`reply_to`/`thread_originator`는 null).
 - `DELETE /api/account/webhooks` `{webhooks:[url], type:"receive"}` → 해당 URL만 삭제됨.
-- **HA OS 실기 E2E (2026-11-25, HA 2026.12.0.dev, SSH로 수동 설치)**: config flow·subentry(REST) 정상, webhook 자동 등록(secret 64자), `binary_sensor` 인증 on, `notify.send_message`(title 첫 줄)·`sendblue.send_message`(이미지+celebration) 도착. 실제 Sendblue 요청이 `sb-signing-secret` 검증을 통과해 이벤트 발생 → **헤더 방식 확인됨**. Assist 왕복 약 2–5초 ("지금 몇 시야" → "오전 7시 1분"). 기본 agent는 띄어쓰기에 민감("몇시야?"는 미인식).
+- **HA OS 실기 E2E (2026-11-25, HA 2026.12.0.dev, SSH로 수동 설치)**: config flow·subentry(REST) 정상, webhook 자동 등록(secret 64자), `binary_sensor` 인증 on, `notify.send_message`(title 첫 줄)·`sendblue.send_message`(이미지+celebration) 도착. 실제 Sendblue 요청이 `sb-signing-secret` 검증을 통과해 이벤트 발생 → **헤더 방식 확인됨**. Assist 왕복 약 2–5초 ("지금 몇 시야" → "오전 7시 1분"). 기본 agent는 띄어쓰기에 민감("몇시야?"는 미인식). Entry 삭제 시 Sendblue receive webhook 1→0개, entity 제거 확인.
 - HA `conversation.async_converse`: ULID가 아닌 `conversation_id`를 넘기면 그 값을 그대로 세션 ID로 사용 (`helpers/chat_session.py`, 2026.11.3). 세션은 5분 동안 사용이 없으면 만료.
 
 ## Design
