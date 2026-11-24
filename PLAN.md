@@ -90,7 +90,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
 
 ### Phase D — 마무리
 
-- [ ] **T10. 번역·문서**
+- [x] **T10. 번역·문서** — hassfest는 로컬 실행 불가(arm64 Docker, 권한 정책)로 CI에서 확인 예정
   - Acceptance: `translations/en.json`, `translations/ko.json`(strings.json과 키 일치), README(설치, Sendblue 무료 가입·번호 인증 절차·E.164 주의, 공유 번호 변경 시 재인증, Assist 노출 entity, 보안 주의).
   - Verify: hassfest 통과 (CI 또는 로컬 `docker`/`linux-test` 머신), `uv run pytest`
   - Files: `translations/en.json`, `translations/ko.json`, `README.md`
