@@ -4,10 +4,10 @@ import hmac
 import logging
 
 from aiohttp import web
-from homeassistant.components import webhook
+from homeassistant.components import conversation, webhook
 from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import CONF_WEBHOOK_ID
-from homeassistant.core import HomeAssistant
+from homeassistant.core import Context, HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
@@ -16,14 +16,18 @@ from .const import (
     CONF_ADDRESS,
     CONF_API_KEY_ID,
     CONF_API_SECRET_KEY,
+    CONF_ASSIST_ENABLED,
+    CONF_CONVERSATION_AGENT_ID,
     CONF_WEBHOOK_BASE_URL,
     CONF_WEBHOOK_SECRET,
+    DEFAULT_CONVERSATION_AGENT_ID,
     DOMAIN,
     EVENT_MESSAGE_RECEIVED,
     SUBENTRY_RECIPIENT,
 )
 
 _LOGGER = logging.getLogger(__name__)
+ASSIST_ERROR_REPLY = "Sorry, Home Assistant could not handle that message."
 
 
 def webhook_url(base_url: str, webhook_id: str) -> str:
@@ -116,13 +120,14 @@ async def async_handle_webhook(
         seen.append(handle)
 
     sender = str(payload.get("from_number") or "")
+    content = str(payload.get("content") or "")
     recipient = _find_recipient(entry, sender)
     hass.bus.async_fire(
         EVENT_MESSAGE_RECEIVED,
         {
             "entry_id": entry.entry_id,
             "from_number": sender,
-            "content": payload.get("content") or "",
+            "content": content,
             "media_url": payload.get("media_url") or "",
             "service": payload.get("service"),
             "message_handle": handle,
@@ -130,7 +135,43 @@ async def async_handle_webhook(
             "recipient_name": recipient.title if recipient else None,
         },
     )
+    # Only allowlisted recipients may reach Assist; reply after acking so
+    # a slow agent never trips Sendblue's 45 s timeout and retries.
+    if recipient and recipient.data[CONF_ASSIST_ENABLED] and content.strip():
+        entry.async_create_background_task(
+            hass, _async_assist_reply(hass, entry, sender, content), "sendblue_assist"
+        )
     return web.Response(status=200)
+
+
+async def _async_assist_reply(
+    hass: HomeAssistant, entry: ConfigEntry, sender: str, text: str
+) -> None:
+    try:
+        result = await conversation.async_converse(
+            hass,
+            text=text,
+            conversation_id=f"sendblue_{entry.entry_id}_{sender}",
+            context=Context(),
+            language=hass.config.language,
+            agent_id=entry.options.get(
+                CONF_CONVERSATION_AGENT_ID, DEFAULT_CONVERSATION_AGENT_ID
+            ),
+        )
+        speech = result.response.speech.get("plain", {}).get("speech", "")
+    except Exception:
+        _LOGGER.exception("Assist failed to handle a Sendblue message")
+        speech = ASSIST_ERROR_REPLY
+    if not speech:
+        return
+
+    runtime = entry.runtime_data
+    try:
+        await runtime.client.send_message(
+            sender, runtime.coordinator.data.from_number, content=speech
+        )
+    except SendblueError as err:
+        _LOGGER.warning("Cannot send Assist reply: %s", err)
 
 
 def _find_recipient(entry: ConfigEntry, sender: str) -> ConfigSubentry | None:

@@ -81,7 +81,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv run pytest tests/test_webhook.py` (`hass_client_no_auth`)
   - Files: `webhook.py`, `tests/test_webhook.py`
 
-- [ ] **T9. Assist 응답**
+- [x] **T9. Assist 응답**
   - Acceptance: `assist_enabled` 수신자 + 비어 있지 않은 `content`일 때만 background task로 `async_converse`(고정 `conversation_id`), 응답 speech를 같은 번호로 발송, 빈 응답 미발송, 예외 시 고정 오류 문구. 비허용·미등록 발신자는 이벤트만.
   - Verify: `uv run pytest tests/test_webhook.py`
   - Files: `webhook.py`, `tests/test_webhook.py`
