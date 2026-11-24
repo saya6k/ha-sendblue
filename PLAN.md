@@ -28,7 +28,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
 
 ### Phase A — 기반
 
-- [ ] **T0. 저장소 골격**
+- [x] **T0. 저장소 골격**
   - Acceptance: `git init`(main), `pyproject.toml`(uv, dev 의존성: `pytest-homeassistant-custom-component`, `pytest-cov`, `ruff`), `manifest.json`, `hacs.json`, `LICENSE`(MIT), `const.py`, 빈 `__init__.py`, `tests/conftest.py`, `.gitignore`. CI(hassfest, HACS validate, pytest) 워크플로.
   - Verify: `uv sync && uv run pytest`(테스트 0개 정상 종료), `uv run ruff check .`
   - Files: `pyproject.toml`, `custom_components/sendblue/{manifest.json,const.py,__init__.py}`, `hacs.json`, `LICENSE`, `.github/workflows/*.yml`

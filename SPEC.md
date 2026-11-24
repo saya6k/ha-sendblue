@@ -140,7 +140,7 @@ HA 자동화에서 가족에게 iMessage(불가 시 SMS)로 알림을 보내고,
 
 ## Tech Stack
 
-- Python 3.14, Home Assistant ≥ 2026.11.0
+- Python 3.14, Home Assistant ≥ 2026.10.0 (테스트 기준: `pytest-homeassistant-custom-component` 최신판이 고정한 2026.10.4)
 - 런타임 의존성 없음 (`aiohttp`는 HA 내장, `async_get_clientsession`)
 - 개발: `uv`, `pytest-homeassistant-custom-component`, `ruff`
 - CI: GitHub Actions — hassfest, HACS action, pytest
