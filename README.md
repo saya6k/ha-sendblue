@@ -80,7 +80,7 @@ triggers:
 
 ### Assist
 
-Messages from recipients with **Allow Assist** turned on are passed to Assist, and the answer is texted back. Choose the conversation agent under the integration's **Configure** button. Assist can only control entities you have [exposed to Assist](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/). Each person keeps their conversation context for 5 minutes. The built-in agent is strict about wording; in Korean, for example, it understands "지금 몇 시야" but not "지금 몇시야?". An LLM-based agent is more forgiving.
+Messages from recipients with **Allow Assist** turned on are passed to Assist, and the answer is texted back. By default the conversation agent and language of your preferred Assist pipeline are used; pick a different agent under the integration's **Configure** button. Assist can only control entities you have [exposed to Assist](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/). Each person keeps their conversation context for 5 minutes. The built-in agent is strict about wording; in Korean, for example, it understands "지금 몇 시야" but not "지금 몇시야?". An LLM-based agent is more forgiving.
 
 ## Reference
 

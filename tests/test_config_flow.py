@@ -249,6 +249,22 @@ async def test_options_flow_sets_conversation_agent(hass: HomeAssistant) -> None
     assert entry.options[CONF_CONVERSATION_AGENT_ID] == "conversation.home_assistant"
 
 
+async def test_options_flow_left_empty_uses_preferred_pipeline(
+    hass: HomeAssistant,
+) -> None:
+    entry = _entry()
+    entry.add_to_hass(hass)
+    hass.config_entries.async_update_entry(
+        entry, options={CONF_CONVERSATION_AGENT_ID: "conversation.home_assistant"}
+    )
+
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {})
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert CONF_CONVERSATION_AGENT_ID not in entry.options
+
+
 async def _start_recipient_flow(hass: HomeAssistant, entry: MockConfigEntry):
     return await hass.config_entries.subentries.async_init(
         (entry.entry_id, "recipient"), context={"source": SOURCE_USER}

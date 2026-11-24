@@ -58,7 +58,7 @@
           "conversation_agent_id": "Conversation agent"
         },
         "data_description": {
-          "conversation_agent_id": "Agent that answers messages from recipients with Assist enabled."
+          "conversation_agent_id": "Leave empty to use the conversation agent of your preferred Assist pipeline."
         }
       }
     }

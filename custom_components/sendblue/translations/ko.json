@@ -58,7 +58,7 @@
           "conversation_agent_id": "대화 에이전트"
         },
         "data_description": {
-          "conversation_agent_id": "Assist가 허용된 수신자의 메시지에 답할 에이전트입니다."
+          "conversation_agent_id": "비워 두면 선호하는 Assist 파이프라인의 대화 에이전트를 사용합니다."
         }
       }
     }

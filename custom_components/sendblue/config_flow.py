@@ -36,7 +36,6 @@ from .const import (
     CONF_LAST_LINE,
     CONF_WEBHOOK_BASE_URL,
     CONF_WEBHOOK_SECRET,
-    DEFAULT_CONVERSATION_AGENT_ID,
     DOMAIN,
     SUBENTRY_RECIPIENT,
 )
@@ -193,15 +192,15 @@ class SendblueOptionsFlow(OptionsFlowWithReload):
     ) -> ConfigFlowResult:
         if user_input is not None:
             return self.async_create_entry(data=user_input)
-        current = self.config_entry.options.get(
-            CONF_CONVERSATION_AGENT_ID, DEFAULT_CONVERSATION_AGENT_ID
-        )
+        # Left empty, replies use the preferred Assist pipeline.
+        current = self.config_entry.options.get(CONF_CONVERSATION_AGENT_ID)
         return self.async_show_form(
             step_id="init",
             data_schema=vol.Schema(
                 {
-                    vol.Required(
-                        CONF_CONVERSATION_AGENT_ID, default=current
+                    vol.Optional(
+                        CONF_CONVERSATION_AGENT_ID,
+                        description={"suggested_value": current},
                     ): ConversationAgentSelector()
                 }
             ),

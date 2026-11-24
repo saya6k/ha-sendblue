@@ -1,9 +1,17 @@
 {
   "domain": "sendblue",
   "name": "Sendblue",
-  "codeowners": ["@saya6k"],
+  "after_dependencies": [
+    "assist_pipeline"
+  ],
+  "codeowners": [
+    "@saya6k"
+  ],
   "config_flow": true,
-  "dependencies": ["conversation", "webhook"],
+  "dependencies": [
+    "conversation",
+    "webhook"
+  ],
   "documentation": "https://github.com/saya6k/hacs-sendblue",
   "integration_type": "service",
   "iot_class": "cloud_push",

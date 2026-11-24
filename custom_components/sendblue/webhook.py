@@ -4,7 +4,7 @@ import hmac
 import logging
 
 from aiohttp import web
-from homeassistant.components import conversation, webhook
+from homeassistant.components import assist_pipeline, conversation, webhook
 from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import Context, HomeAssistant
@@ -20,7 +20,6 @@ from .const import (
     CONF_CONVERSATION_AGENT_ID,
     CONF_WEBHOOK_BASE_URL,
     CONF_WEBHOOK_SECRET,
-    DEFAULT_CONVERSATION_AGENT_ID,
     DOMAIN,
     EVENT_MESSAGE_RECEIVED,
     SUBENTRY_RECIPIENT,
@@ -147,16 +146,15 @@ async def async_handle_webhook(
 async def _async_assist_reply(
     hass: HomeAssistant, entry: ConfigEntry, sender: str, text: str
 ) -> None:
+    agent_id, language = _resolve_agent(hass, entry)
     try:
         result = await conversation.async_converse(
             hass,
             text=text,
             conversation_id=f"sendblue_{entry.entry_id}_{sender}",
             context=Context(),
-            language=hass.config.language,
-            agent_id=entry.options.get(
-                CONF_CONVERSATION_AGENT_ID, DEFAULT_CONVERSATION_AGENT_ID
-            ),
+            language=language,
+            agent_id=agent_id,
         )
         speech = result.response.speech.get("plain", {}).get("speech", "")
     except Exception:
@@ -172,6 +170,21 @@ async def _async_assist_reply(
         )
     except SendblueError as err:
         _LOGGER.warning("Cannot send Assist reply: %s", err)
+
+
+def _resolve_agent(hass: HomeAssistant, entry: ConfigEntry) -> tuple[str, str]:
+    """Use the configured agent, else the preferred Assist pipeline's agent."""
+    if agent_id := entry.options.get(CONF_CONVERSATION_AGENT_ID):
+        return agent_id, hass.config.language
+    # async_converse alone would fall back to the built-in agent, not the
+    # pipeline the user picked as preferred.
+    if "assist_pipeline" in hass.config.components:
+        pipeline = assist_pipeline.async_get_pipeline(hass)
+        language = pipeline.conversation_language
+        if language == "*":
+            language = hass.config.language
+        return pipeline.conversation_engine, language
+    return conversation.HOME_ASSISTANT_AGENT, hass.config.language
 
 
 def _find_recipient(entry: ConfigEntry, sender: str) -> ConfigSubentry | None:

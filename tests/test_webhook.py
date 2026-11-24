@@ -1,5 +1,6 @@
 """Tests for the incoming message webhook and Assist replies."""
 
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import pytest
@@ -265,3 +266,60 @@ async def test_reply_send_failure_is_logged(
 
     assert resp.status == 200
     assert "Cannot send Assist reply" in caplog.text
+
+
+async def test_assist_defaults_to_preferred_pipeline(
+    hass: HomeAssistant, assist_client, converse
+) -> None:
+    hass.config.components.add("assist_pipeline")
+    pipeline = SimpleNamespace(
+        conversation_engine="conversation.claude", conversation_language="ko"
+    )
+
+    with patch(
+        "homeassistant.components.assist_pipeline.async_get_pipeline",
+        return_value=pipeline,
+    ):
+        await assist_client.post(URL, json=_payload(), headers=HEADERS)
+        await hass.async_block_till_done()
+
+    assert converse.call_args.kwargs["agent_id"] == "conversation.claude"
+    assert converse.call_args.kwargs["language"] == "ko"
+
+
+async def test_explicit_agent_overrides_preferred_pipeline(
+    hass: HomeAssistant, assist_client, mock_entry, converse
+) -> None:
+    hass.config.components.add("assist_pipeline")
+    hass.config_entries.async_update_entry(
+        mock_entry, options={"conversation_agent_id": "conversation.other"}
+    )
+
+    with patch(
+        "homeassistant.components.assist_pipeline.async_get_pipeline",
+        return_value=SimpleNamespace(
+            conversation_engine="conversation.claude", conversation_language="ko"
+        ),
+    ):
+        await assist_client.post(URL, json=_payload(), headers=HEADERS)
+        await hass.async_block_till_done()
+
+    assert converse.call_args.kwargs["agent_id"] == "conversation.other"
+    assert converse.call_args.kwargs["language"] == hass.config.language
+
+
+async def test_pipeline_any_language_falls_back_to_system_language(
+    hass: HomeAssistant, assist_client, converse
+) -> None:
+    hass.config.components.add("assist_pipeline")
+
+    with patch(
+        "homeassistant.components.assist_pipeline.async_get_pipeline",
+        return_value=SimpleNamespace(
+            conversation_engine="conversation.claude", conversation_language="*"
+        ),
+    ):
+        await assist_client.post(URL, json=_payload(), headers=HEADERS)
+        await hass.async_block_till_done()
+
+    assert converse.call_args.kwargs["language"] == hass.config.language

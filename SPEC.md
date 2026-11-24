@@ -80,7 +80,7 @@ HA 자동화에서 가족에게 iMessage(불가 시 SMS)로 알림을 보내고,
 | `api_key_id`, `api_secret_key` | `data` | 검증: `GET /api/lines` 200 + 번호 1개 이상 |
 | `webhook_base_url` | `data` | 기본값: `get_url(hass, allow_internal=False, prefer_external=True)`, 실패 시 빈 칸. `https://`만 허용 |
 | `webhook_id`, `webhook_secret` | `data` | 생성 시 `secrets.token_hex(32)` 등으로 자동 생성, UI 노출 안 함 |
-| `conversation_agent_id` | `options` | 기본 `conversation.home_assistant` |
+| `conversation_agent_id` | `options` | 선택. 비우면 선호 Assist 파이프라인의 에이전트·언어 사용 (`assist_pipeline` 미로드 시 `conversation.home_assistant`) |
 
 - `from_number`는 **저장하지 않는다** (공유 번호가 바뀜). Coordinator가 갱신한 현재 회선을 쓴다.
 - `unique_id` = `api_key_id` (같은 계정 중복 등록 방지).

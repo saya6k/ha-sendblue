@@ -78,7 +78,7 @@ triggers:
 
 ### Assist
 
-**Assist 허용**이 켜진 사람의 메시지는 Assist로 전달되고, 답이 문자로 돌아갑니다. Assist는 [Assist에 노출한](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/) entity만 제어할 수 있습니다. 대화 맥락은 사람별로 5분 동안 유지됩니다.
+**Assist 허용**이 켜진 사람의 메시지는 Assist로 전달되고, 답이 문자로 돌아갑니다. 기본으로 선호하는 Assist 파이프라인의 대화 에이전트와 언어를 쓰며, 통합구성요소의 **구성**에서 다른 에이전트를 고를 수 있습니다. Assist는 [Assist에 노출한](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/) entity만 제어할 수 있습니다. 대화 맥락은 사람별로 5분 동안 유지됩니다.
 
 기본 대화 에이전트는 표현에 엄격합니다. 예를 들어 "지금 몇 시야"는 알아듣지만 "지금 몇시야?"는 못 알아듣습니다. LLM 기반 에이전트가 더 유연합니다.
 
