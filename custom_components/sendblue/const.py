@@ -33,3 +33,5 @@ SEND_STYLES = [
     "loud",
     "slam",
 ]
+
+EVENT_MESSAGE_RECEIVED = "sendblue_message_received"

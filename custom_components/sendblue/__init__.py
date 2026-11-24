@@ -1,6 +1,7 @@
 """The Sendblue integration."""
 
-from dataclasses import dataclass
+from collections import deque
+from dataclasses import dataclass, field
 
 import voluptuous as vol
 from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
@@ -40,6 +41,8 @@ class SendblueRuntimeData:
 
     client: SendblueClient
     coordinator: SendblueCoordinator
+    # Sendblue retries on 5xx; remember recent handles to act once.
+    seen_handles: deque[str] = field(default_factory=lambda: deque(maxlen=256))
 
 
 type SendblueConfigEntry = ConfigEntry[SendblueRuntimeData]

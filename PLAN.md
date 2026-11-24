@@ -76,7 +76,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv run pytest tests/test_init.py`
   - Files: `__init__.py`, `webhook.py`(등록 함수), `strings.json`, `tests/test_init.py`
 
-- [ ] **T8. Webhook 핸들러**
+- [x] **T8. Webhook 핸들러**
   - Acceptance: secret `hmac.compare_digest` 불일치 401 / JSON 오류 400 / outbound·group 무시 / `message_handle` 중복 무시(최근 256개) / `sendblue_message_received` 이벤트(SPEC 필드) / 항상 빠르게 200.
   - Verify: `uv run pytest tests/test_webhook.py` (`hass_client_no_auth`)
   - Files: `webhook.py`, `tests/test_webhook.py`

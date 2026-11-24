@@ -1,10 +1,11 @@
 """Incoming message webhook: registration with HA and Sendblue."""
 
+import hmac
 import logging
 
 from aiohttp import web
 from homeassistant.components import webhook
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigSubentry
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
@@ -12,11 +13,14 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import SendblueClient, SendblueError
 from .const import (
+    CONF_ADDRESS,
     CONF_API_KEY_ID,
     CONF_API_SECRET_KEY,
     CONF_WEBHOOK_BASE_URL,
     CONF_WEBHOOK_SECRET,
     DOMAIN,
+    EVENT_MESSAGE_RECEIVED,
+    SUBENTRY_RECIPIENT,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -84,5 +88,59 @@ async def async_delete_remote_webhook(
 
 async def async_handle_webhook(
     hass: HomeAssistant, webhook_id: str, request: web.Request
-) -> web.Response | None:
-    return None
+) -> web.Response:
+    entry = next(
+        e
+        for e in hass.config_entries.async_loaded_entries(DOMAIN)
+        if e.data[CONF_WEBHOOK_ID] == webhook_id
+    )
+    given = request.headers.get("sb-signing-secret", "")
+    if not hmac.compare_digest(
+        given.encode(), entry.data[CONF_WEBHOOK_SECRET].encode()
+    ):
+        return web.Response(status=401)
+    try:
+        payload = await request.json()
+    except ValueError:
+        return web.Response(status=400)
+    if not isinstance(payload, dict):
+        return web.Response(status=400)
+
+    if payload.get("is_outbound") or payload.get("group_id"):
+        return web.Response(status=200)
+    handle = payload.get("message_handle")
+    seen = entry.runtime_data.seen_handles
+    if handle:
+        if handle in seen:
+            return web.Response(status=200)
+        seen.append(handle)
+
+    sender = str(payload.get("from_number") or "")
+    recipient = _find_recipient(entry, sender)
+    hass.bus.async_fire(
+        EVENT_MESSAGE_RECEIVED,
+        {
+            "entry_id": entry.entry_id,
+            "from_number": sender,
+            "content": payload.get("content") or "",
+            "media_url": payload.get("media_url") or "",
+            "service": payload.get("service"),
+            "message_handle": handle,
+            "recipient_subentry_id": recipient.subentry_id if recipient else None,
+            "recipient_name": recipient.title if recipient else None,
+        },
+    )
+    return web.Response(status=200)
+
+
+def _find_recipient(entry: ConfigEntry, sender: str) -> ConfigSubentry | None:
+    sender = sender.lower()
+    return next(
+        (
+            sub
+            for sub in entry.subentries.values()
+            if sub.subentry_type == SUBENTRY_RECIPIENT
+            and sub.data[CONF_ADDRESS] == sender
+        ),
+        None,
+    )
