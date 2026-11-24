@@ -1,6 +1,7 @@
 """Shared fixtures for Sendblue tests."""
 
 import pytest
+from homeassistant.config_entries import ConfigSubentryData
 from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
@@ -33,9 +34,10 @@ MOM = "+821012345678"
 
 
 @pytest.fixture
-def mock_entry():
-    """A configured Sendblue entry (not yet added to hass)."""
+def mock_entry(mom_subentry: ConfigSubentryData) -> MockConfigEntry:
+    """A configured Sendblue entry with one recipient (not yet added to hass)."""
     return MockConfigEntry(
+        subentries_data=[mom_subentry],
         domain=DOMAIN,
         unique_id="key-id",
         data={
@@ -57,3 +59,13 @@ def mock_api(aioclient_mock):
         json={"sharedNumber": LINE, "contacts": [{"number": MOM, "verified": True}]},
     )
     return aioclient_mock
+
+
+@pytest.fixture
+def mom_subentry() -> ConfigSubentryData:
+    return ConfigSubentryData(
+        data={"address": MOM, "assist_enabled": False},
+        subentry_type="recipient",
+        title="Mom",
+        unique_id=MOM,
+    )

@@ -10,13 +10,16 @@ from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
-    OptionsFlow,
+    ConfigSubentryFlow,
+    OptionsFlowWithReload,
+    SubentryFlowResult,
 )
-from homeassistant.const import CONF_WEBHOOK_ID
+from homeassistant.const import CONF_NAME, CONF_WEBHOOK_ID
 from homeassistant.core import callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.network import NoURLAvailableError, get_url
 from homeassistant.helpers.selector import (
+    BooleanSelector,
     ConversationAgentSelector,
     TextSelector,
     TextSelectorConfig,
@@ -25,14 +28,19 @@ from homeassistant.helpers.selector import (
 
 from .api import SendblueAuthError, SendblueClient, SendblueError
 from .const import (
+    CONF_ADDRESS,
     CONF_API_KEY_ID,
     CONF_API_SECRET_KEY,
+    CONF_ASSIST_ENABLED,
     CONF_CONVERSATION_AGENT_ID,
+    CONF_LAST_LINE,
     CONF_WEBHOOK_BASE_URL,
     CONF_WEBHOOK_SECRET,
     DEFAULT_CONVERSATION_AGENT_ID,
     DOMAIN,
+    SUBENTRY_RECIPIENT,
 )
+from .phone import normalize_address
 
 _PASSWORD = TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))
 _URL = TextSelector(TextSelectorConfig(type=TextSelectorType.URL))
@@ -161,11 +169,18 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
 
     @staticmethod
     @callback
-    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlow:
+    def async_get_options_flow(config_entry: ConfigEntry) -> OptionsFlowWithReload:
         return SendblueOptionsFlow()
 
+    @classmethod
+    @callback
+    def async_get_supported_subentry_types(
+        cls, config_entry: ConfigEntry
+    ) -> dict[str, type[ConfigSubentryFlow]]:
+        return {SUBENTRY_RECIPIENT: RecipientSubentryFlow}
 
-class SendblueOptionsFlow(OptionsFlow):
+
+class SendblueOptionsFlow(OptionsFlowWithReload):
     """Choose the conversation agent used for replies."""
 
     async def async_step_init(
@@ -185,4 +200,75 @@ class SendblueOptionsFlow(OptionsFlow):
                     ): ConversationAgentSelector()
                 }
             ),
+        )
+
+
+class RecipientSubentryFlow(ConfigSubentryFlow):
+    """Add or edit a recipient."""
+
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
+        return await self._async_step_form("user", user_input)
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> SubentryFlowResult:
+        return await self._async_step_form("reconfigure", user_input)
+
+    async def _async_step_form(
+        self, step_id: str, user_input: dict[str, Any] | None
+    ) -> SubentryFlowResult:
+        entry = self._get_entry()
+        editing = self._get_reconfigure_subentry() if step_id == "reconfigure" else None
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            try:
+                address = normalize_address(
+                    user_input[CONF_ADDRESS], self.hass.config.country
+                )
+            except ValueError:
+                errors[CONF_ADDRESS] = "invalid_address"
+            else:
+                if any(
+                    sub.unique_id == address and sub is not editing
+                    for sub in entry.subentries.values()
+                ):
+                    errors[CONF_ADDRESS] = "duplicate_address"
+            if not errors:
+                data = {
+                    CONF_ADDRESS: address,
+                    CONF_ASSIST_ENABLED: user_input.get(CONF_ASSIST_ENABLED, False),
+                }
+                if editing is not None:
+                    return self.async_update_reload_and_abort(
+                        entry,
+                        editing,
+                        title=user_input[CONF_NAME],
+                        data=data,
+                        unique_id=address,
+                    )
+                # New recipients need a reload to get their entities.
+                self.hass.config_entries.async_schedule_reload(entry.entry_id)
+                return self.async_create_entry(
+                    title=user_input[CONF_NAME], data=data, unique_id=address
+                )
+
+        defaults: dict[str, Any] = {}
+        if editing is not None:
+            defaults = {CONF_NAME: editing.title, **editing.data}
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_NAME): str,
+                vol.Required(CONF_ADDRESS): str,
+                vol.Optional(CONF_ASSIST_ENABLED, default=False): BooleanSelector(),
+            }
+        )
+        return self.async_show_form(
+            step_id=step_id,
+            data_schema=self.add_suggested_values_to_schema(
+                schema, user_input or defaults
+            ),
+            errors=errors,
+            description_placeholders={"number": entry.data.get(CONF_LAST_LINE, "-")},
         )

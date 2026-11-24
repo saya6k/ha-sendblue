@@ -57,7 +57,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv run pytest tests/test_coordinator.py`
   - Files: `coordinator.py`, `__init__.py`, `strings.json`, `tests/test_coordinator.py`
 
-- [ ] **T5. 수신자 subentry + notify**
+- [x] **T5. 수신자 subentry + notify**
   - Acceptance: subentry flow(`name`, `address`→T1 정규화, `assist_enabled`), 같은 entry 내 주소 중복 거부, 설명에 현재 공유 번호 표시. 수신자별 device + `NotifyEntity`(title 합치기). Entity action `sendblue.send_message`(`message`, `title`, `media_url`, `send_style` select). API 예외 → 번역 키가 있는 `HomeAssistantError`, 발송 실패 시 coordinator 갱신 요청.
   - Verify: `uv run pytest tests/test_config_flow.py tests/test_notify.py`
   - Files: `config_flow.py`, `notify.py`, `services.yaml`, `strings.json`, `tests/test_notify.py`

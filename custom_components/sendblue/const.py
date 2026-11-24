@@ -10,3 +10,26 @@ CONF_CONVERSATION_AGENT_ID = "conversation_agent_id"
 
 DEFAULT_CONVERSATION_AGENT_ID = "conversation.home_assistant"
 CONF_LAST_LINE = "last_line"
+
+SUBENTRY_RECIPIENT = "recipient"
+CONF_ADDRESS = "address"
+CONF_ASSIST_ENABLED = "assist_enabled"
+
+SERVICE_SEND_MESSAGE = "send_message"
+ATTR_MEDIA_URL = "media_url"
+ATTR_SEND_STYLE = "send_style"
+SEND_STYLES = [
+    "celebration",
+    "shooting_star",
+    "fireworks",
+    "lasers",
+    "love",
+    "confetti",
+    "balloons",
+    "spotlight",
+    "echo",
+    "invisible",
+    "gentle",
+    "loud",
+    "slam",
+]

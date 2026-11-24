@@ -207,3 +207,78 @@ async def test_options_flow_sets_conversation_agent(hass: HomeAssistant) -> None
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options[CONF_CONVERSATION_AGENT_ID] == "conversation.home_assistant"
+
+
+async def _start_recipient_flow(hass: HomeAssistant, entry: MockConfigEntry):
+    return await hass.config_entries.subentries.async_init(
+        (entry.entry_id, "recipient"), context={"source": SOURCE_USER}
+    )
+
+
+async def test_add_recipient_normalizes_number_and_shows_line(
+    hass: HomeAssistant,
+) -> None:
+    await async_process_ha_core_config(hass, {"country": "KR"})
+    entry = _entry(last_line="+16173011689")
+    entry.add_to_hass(hass)
+
+    result = await _start_recipient_flow(hass, entry)
+    assert result["description_placeholders"] == {"number": "+16173011689"}
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        {"name": "Mom", "address": "010-1234-5678", "assist_enabled": True},
+    )
+
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    subentry = next(iter(entry.subentries.values()))
+    assert subentry.title == "Mom"
+    assert subentry.unique_id == "+821012345678"
+    assert subentry.data == {"address": "+821012345678", "assist_enabled": True}
+
+
+async def test_add_recipient_rejects_invalid_and_duplicate(
+    hass: HomeAssistant,
+) -> None:
+    await async_process_ha_core_config(hass, {"country": "KR"})
+    entry = _entry()
+    entry.add_to_hass(hass)
+    result = await _start_recipient_flow(hass, entry)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], {"name": "Mom", "address": "010-1234-5678"}
+    )
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+
+    result = await _start_recipient_flow(hass, entry)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], {"name": "Dad", "address": "nonsense"}
+    )
+    assert result["errors"] == {"address": "invalid_address"}
+
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"], {"name": "Dad", "address": "+82 10 1234 5678"}
+    )
+    assert result["errors"] == {"address": "duplicate_address"}
+
+
+async def test_reconfigure_recipient_updates_data(hass: HomeAssistant) -> None:
+    await async_process_ha_core_config(hass, {"country": "KR"})
+    entry = _entry()
+    entry.add_to_hass(hass)
+    result = await _start_recipient_flow(hass, entry)
+    await hass.config_entries.subentries.async_configure(
+        result["flow_id"], {"name": "Mom", "address": "010-1234-5678"}
+    )
+    subentry_id = next(iter(entry.subentries))
+
+    result = await entry.start_subentry_reconfigure_flow(hass, subentry_id)
+    result = await hass.config_entries.subentries.async_configure(
+        result["flow_id"],
+        {"name": "Mother", "address": "010-1234-5678", "assist_enabled": True},
+    )
+
+    assert result["type"] is FlowResultType.ABORT
+    assert result["reason"] == "reconfigure_successful"
+    subentry = entry.subentries[subentry_id]
+    assert subentry.title == "Mother"
+    assert subentry.data["assist_enabled"] is True

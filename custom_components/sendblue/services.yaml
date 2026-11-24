@@ -1,0 +1,37 @@
+send_message:
+  target:
+    entity:
+      integration: sendblue
+      domain: notify
+  fields:
+    message:
+      required: true
+      selector:
+        text:
+          multiline: true
+    title:
+      selector:
+        text:
+    media_url:
+      example: "https://example.com/image.jpg"
+      selector:
+        text:
+          type: url
+    send_style:
+      selector:
+        select:
+          translation_key: send_style
+          options:
+            - celebration
+            - shooting_star
+            - fireworks
+            - lasers
+            - love
+            - confetti
+            - balloons
+            - spotlight
+            - echo
+            - invisible
+            - gentle
+            - loud
+            - slam

@@ -2,15 +2,30 @@
 
 from dataclasses import dataclass
 
+import voluptuous as vol
+from homeassistant.components.notify import DOMAIN as NOTIFY_DOMAIN
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import service
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.typing import ConfigType
 
 from .api import SendblueClient
-from .const import CONF_API_KEY_ID, CONF_API_SECRET_KEY
+from .const import (
+    ATTR_MEDIA_URL,
+    ATTR_SEND_STYLE,
+    CONF_API_KEY_ID,
+    CONF_API_SECRET_KEY,
+    DOMAIN,
+    SEND_STYLES,
+    SERVICE_SEND_MESSAGE,
+)
 from .coordinator import SendblueCoordinator
 
-PLATFORMS: list[str] = []
+PLATFORMS: list[Platform] = [Platform.NOTIFY]
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 @dataclass
@@ -22,6 +37,23 @@ class SendblueRuntimeData:
 
 
 type SendblueConfigEntry = ConfigEntry[SendblueRuntimeData]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    service.async_register_platform_entity_service(
+        hass,
+        DOMAIN,
+        SERVICE_SEND_MESSAGE,
+        entity_domain=NOTIFY_DOMAIN,
+        schema={
+            vol.Required("message"): cv.string,
+            vol.Optional("title"): cv.string,
+            vol.Optional(ATTR_MEDIA_URL): cv.url,
+            vol.Optional(ATTR_SEND_STYLE): vol.In(SEND_STYLES),
+        },
+        func="async_send_rich_message",
+    )
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: SendblueConfigEntry) -> bool:
