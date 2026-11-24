@@ -40,6 +40,16 @@
       "reconfigure_successful": "The public URL was updated."
     }
   },
+  "issues": {
+    "line_changed": {
+      "title": "Sendblue shared number changed",
+      "description": "Your Sendblue line is now {number}. Each recipient must text this number once before they can receive messages again."
+    },
+    "webhook_registration_failed": {
+      "title": "Sendblue cannot deliver incoming messages",
+      "description": "Registering the webhook with Sendblue failed. Sending still works, but replies and Assist will not until the integration is reloaded successfully."
+    }
+  },
   "options": {
     "step": {
       "init": {

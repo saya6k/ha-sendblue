@@ -9,3 +9,4 @@ CONF_WEBHOOK_SECRET = "webhook_secret"
 CONF_CONVERSATION_AGENT_ID = "conversation_agent_id"
 
 DEFAULT_CONVERSATION_AGENT_ID = "conversation.home_assistant"
+CONF_LAST_LINE = "last_line"

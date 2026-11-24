@@ -8,6 +8,7 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import SendblueClient
 from .const import CONF_API_KEY_ID, CONF_API_SECRET_KEY
+from .coordinator import SendblueCoordinator
 
 PLATFORMS: list[str] = []
 
@@ -17,6 +18,7 @@ class SendblueRuntimeData:
     """Objects shared by the platforms of one entry."""
 
     client: SendblueClient
+    coordinator: SendblueCoordinator
 
 
 type SendblueConfigEntry = ConfigEntry[SendblueRuntimeData]
@@ -28,7 +30,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: SendblueConfigEntry) -> 
         entry.data[CONF_API_KEY_ID],
         entry.data[CONF_API_SECRET_KEY],
     )
-    entry.runtime_data = SendblueRuntimeData(client=client)
+    coordinator = SendblueCoordinator(hass, entry, client)
+    await coordinator.async_config_entry_first_refresh()
+    entry.runtime_data = SendblueRuntimeData(client=client, coordinator=coordinator)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 

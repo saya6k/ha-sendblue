@@ -52,7 +52,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
 
 ### Phase B — 알림
 
-- [ ] **T4. Coordinator**
+- [x] **T4. Coordinator**
   - Acceptance: 30분 주기로 `get_lines` + `get_shared_contacts`. `shared-contacts` 실패는 인증 상태만 `None`. 회선 번호가 `entry.data`의 마지막 값과 다르면 repair issue 생성 후 값 갱신. `async_request_refresh`로 즉시 갱신 가능.
   - Verify: `uv run pytest tests/test_coordinator.py`
   - Files: `coordinator.py`, `__init__.py`, `strings.json`, `tests/test_coordinator.py`
