@@ -1,36 +1,60 @@
-[project]
-name = "ha-sendblue"
-version = "0.1.0"
-description = "Sendblue iMessage notifications and Assist for Home Assistant"
-requires-python = ">=3.14.2"
-license = "MIT"
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
 
-[dependency-groups]
-dev = [
-    "pytest-homeassistant-custom-component>=0.13.375",
-    "pytest-cov",
-    # Required by HA's conversation component, loaded as our dependency.
-    "gazetteer-matcher==1.1.0",
-    "hassil==3.12.1",
-    "home-assistant-intents==2026.10.6",
-    # Imported when resolving the preferred Assist pipeline.
-    "ha-ffmpeg==3.2.2",
-    "mutagen==1.48.1",
-    "pymicro-vad==1.0.1",
-    "pyspeex-noise==1.0.2",
-    "ruff",
+[project]
+name = "ha_sendblue"
+version = "0.1.0"
+description = "Home Assistant custom component for Sendblue iMessage notifications and Assist replies"
+readme = "README.md"
+requires-python = ">=3.14"
+license = { text = "MIT" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+  "E", "F", "W",      # pycodestyle / pyflakes
+  "I",                # isort
+  "UP",               # pyupgrade
+  "B",                # bugbear
+  "SIM",              # simplify
+  "RUF",              # ruff-specific
+  "PL",               # pylint subset
+  "ANN",              # annotations
+  "ASYNC",
+  "TID",
 ]
+ignore = [
+  "ANN401",  # Any allowed in narrow places
+  "PLR2004", # magic numbers in tests are fine
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["ANN", "PL", "S"]
+# Vendored verbatim/near-verbatim from home-assistant/core tests/ (see
+# tests/vendor/__init__.py) — kept close to upstream style to stay diffable.
+"tests/vendor/*.py" = ["ASYNC109", "UP049"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components.sendblue"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+plugins = []
+
+[[tool.mypy.overrides]]
+module = ["homeassistant.*", "voluptuous.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-
-[tool.ruff]
-target-version = "py314"
-extend-exclude = ["*.md"]
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["custom_components"]
+addopts = "-q"

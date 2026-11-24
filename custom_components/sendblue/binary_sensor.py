@@ -34,9 +34,7 @@ class VerifiedBinarySensor(CoordinatorEntity[SendblueCoordinator], BinarySensorE
     _attr_translation_key = "verified"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
-    def __init__(
-        self, coordinator: SendblueCoordinator, subentry: ConfigSubentry
-    ) -> None:
+    def __init__(self, coordinator: SendblueCoordinator, subentry: ConfigSubentry) -> None:
         super().__init__(coordinator)
         self._address: str = subentry.data[CONF_ADDRESS]
         self._attr_unique_id = f"{subentry.subentry_id}_verified"

@@ -27,9 +27,7 @@ class SendblueData:
 class SendblueCoordinator(DataUpdateCoordinator[SendblueData]):
     """Refresh the shared line; free-plan lines can be reassigned."""
 
-    def __init__(
-        self, hass: HomeAssistant, entry: ConfigEntry, client: SendblueClient
-    ) -> None:
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, client: SendblueClient) -> None:
         super().__init__(
             hass,
             _LOGGER,

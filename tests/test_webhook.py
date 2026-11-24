@@ -7,7 +7,8 @@ import pytest
 from homeassistant.components.conversation import ConversationResult
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import intent
-from pytest_homeassistant_custom_component.common import async_capture_events
+
+from tests.vendor.ha_common import async_capture_events
 
 from .conftest import LINE, MOM, mock_webhooks
 
@@ -39,9 +40,7 @@ async def client(hass: HomeAssistant, mock_entry, mock_api, hass_client_no_auth)
     return await hass_client_no_auth()
 
 
-async def test_message_from_recipient_fires_event(
-    hass: HomeAssistant, client, mock_entry
-) -> None:
+async def test_message_from_recipient_fires_event(hass: HomeAssistant, client, mock_entry) -> None:
     events = async_capture_events(hass, EVENT)
 
     resp = await client.post(URL, json=_payload(), headers=HEADERS)
@@ -76,9 +75,7 @@ async def test_message_from_unknown_sender_fires_event_without_recipient(
 
 
 @pytest.mark.parametrize("headers", [{}, {"sb-signing-secret": "wrong"}])
-async def test_wrong_secret_is_rejected_without_event(
-    hass: HomeAssistant, client, headers
-) -> None:
+async def test_wrong_secret_is_rejected_without_event(hass: HomeAssistant, client, headers) -> None:
     events = async_capture_events(hass, EVENT)
 
     resp = await client.post(URL, json=_payload(), headers=headers)
@@ -172,9 +169,7 @@ async def test_assist_reply_is_sent_back_to_sender(
     assert kwargs["text"] == "Turn off the lights"
     assert kwargs["conversation_id"] == f"sendblue_{mock_entry.entry_id}_{MOM}"
     assert kwargs["agent_id"] == "conversation.home_assistant"
-    assert _replies(mock_api) == [
-        {"number": MOM, "from_number": LINE, "content": "Lights are off"}
-    ]
+    assert _replies(mock_api) == [{"number": MOM, "from_number": LINE, "content": "Lights are off"}]
 
 
 async def test_assist_uses_configured_agent(
@@ -248,9 +243,7 @@ async def test_reply_send_failure_is_logged(
     caplog,
 ) -> None:
     aioclient_mock.get("https://api.sendblue.com/api/lines", json={"numbers": [LINE]})
-    aioclient_mock.get(
-        "https://api.sendblue.com/accounts/shared-contacts", json={"contacts": []}
-    )
+    aioclient_mock.get("https://api.sendblue.com/accounts/shared-contacts", json={"contacts": []})
     mock_webhooks(aioclient_mock)
     aioclient_mock.post(SEND_URL, status=500, json={})
     mock_entry.add_to_hass(hass)

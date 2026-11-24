@@ -33,9 +33,7 @@ class SendblueFreePlanLimit(SendblueError):
 class SendblueClient:
     """Thin async wrapper around the Sendblue REST API."""
 
-    def __init__(
-        self, session: aiohttp.ClientSession, key_id: str, secret: str
-    ) -> None:
+    def __init__(self, session: aiohttp.ClientSession, key_id: str, secret: str) -> None:
         self._session = session
         self._headers = {"sb-api-key-id": key_id, "sb-api-secret-key": secret}
 

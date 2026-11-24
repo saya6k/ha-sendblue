@@ -1,6 +1,8 @@
 # Home Assistant용 Sendblue
 
-[English](README.md)
+> Home Assistant **2026.10.4** 이상이 필요합니다.
+
+> 영문 문서가 기준입니다 — [English](../en/index.md) (번역이 늦을 수 있습니다).
 
 [Sendblue](https://sendblue.com)를 통해 Home Assistant에서 가족에게 iMessage를 보내고, 가족이 답장으로 Assist에 말을 걸어 집을 제어할 수 있게 합니다. Mac이나 여분 iPhone이 필요 없습니다. 메시지는 Sendblue의 Apple 기기가 보냅니다.
 
@@ -12,7 +14,7 @@
 
 ## 준비물
 
-- Home Assistant 2026.10 이상
+- Home Assistant 2026.10.4 이상
 - 외부에서 접속되는 HTTPS 주소 (Nabu Casa 원격 URL이나 자체 도메인). 받은 메시지가 이 주소로 들어옵니다. 보내기만 할 거라면 없어도 됩니다.
 - Sendblue 계정. 무료 플랜 기준으로 만들었습니다.
 

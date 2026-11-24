@@ -70,9 +70,7 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
             return "cannot_connect"
         return None if lines else "no_lines"
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         errors: dict[str, str] = {}
         if user_input is not None:
             url = _clean_url(user_input[CONF_WEBHOOK_BASE_URL])
@@ -98,9 +96,7 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
                     )
 
         try:
-            default_url = get_url(
-                self.hass, allow_internal=False, allow_ip=False, require_ssl=True
-            )
+            default_url = get_url(self.hass, allow_internal=False, allow_ip=False, require_ssl=True)
         except NoURLAvailableError:
             default_url = ""
         schema = vol.Schema(
@@ -115,9 +111,7 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
-    async def async_step_reauth(
-        self, entry_data: Mapping[str, Any]
-    ) -> ConfigFlowResult:
+    async def async_step_reauth(self, entry_data: Mapping[str, Any]) -> ConfigFlowResult:
         return await self.async_step_reauth_confirm()
 
     async def async_step_reauth_confirm(
@@ -161,15 +155,9 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
                     entry, data_updates={CONF_WEBHOOK_BASE_URL: url}
                 )
         schema = vol.Schema(
-            {
-                vol.Required(
-                    CONF_WEBHOOK_BASE_URL, default=entry.data[CONF_WEBHOOK_BASE_URL]
-                ): _URL
-            }
+            {vol.Required(CONF_WEBHOOK_BASE_URL, default=entry.data[CONF_WEBHOOK_BASE_URL]): _URL}
         )
-        return self.async_show_form(
-            step_id="reconfigure", data_schema=schema, errors=errors
-        )
+        return self.async_show_form(step_id="reconfigure", data_schema=schema, errors=errors)
 
     @staticmethod
     @callback
@@ -187,9 +175,7 @@ class SendblueConfigFlow(ConfigFlow, domain=DOMAIN):
 class SendblueOptionsFlow(OptionsFlowWithReload):
     """Choose the conversation agent used for replies."""
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         if user_input is not None:
             return self.async_create_entry(data=user_input)
         # Left empty, replies use the preferred Assist pipeline.
@@ -210,9 +196,7 @@ class SendblueOptionsFlow(OptionsFlowWithReload):
 class RecipientSubentryFlow(ConfigSubentryFlow):
     """Add or edit a recipient."""
 
-    async def async_step_user(
-        self, user_input: dict[str, Any] | None = None
-    ) -> SubentryFlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> SubentryFlowResult:
         return await self._async_step_form("user", user_input)
 
     async def async_step_reconfigure(
@@ -228,9 +212,7 @@ class RecipientSubentryFlow(ConfigSubentryFlow):
         errors: dict[str, str] = {}
         if user_input is not None:
             try:
-                address = normalize_address(
-                    user_input[CONF_ADDRESS], self.hass.config.country
-                )
+                address = normalize_address(user_input[CONF_ADDRESS], self.hass.config.country)
             except ValueError:
                 errors[CONF_ADDRESS] = "invalid_address"
             else:
@@ -270,9 +252,7 @@ class RecipientSubentryFlow(ConfigSubentryFlow):
         )
         return self.async_show_form(
             step_id=step_id,
-            data_schema=self.add_suggested_values_to_schema(
-                schema, user_input or defaults
-            ),
+            data_schema=self.add_suggested_values_to_schema(schema, user_input or defaults),
             errors=errors,
             description_placeholders={"number": entry.data.get(CONF_LAST_LINE, "-")},
         )

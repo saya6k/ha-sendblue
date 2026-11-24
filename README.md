@@ -1,6 +1,14 @@
 # Sendblue for Home Assistant
 
-[한국어](README.ko.md)
+> Requires Home Assistant **2026.10.4** or later.
+
+[![Built with Claude Code](https://img.shields.io/badge/Built%20with%20Claude%20Code-D97757?style=for-the-badge&logo=claude&logoColor=white)](https://claude.ai/code)
+[![Home Assistant](https://img.shields.io/badge/Home%20Assistant-41BDF5?style=for-the-badge&logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5?style=for-the-badge&logo=homeassistantcommunitystore&logoColor=white)](https://hacs.xyz/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+
+Documentation: [English](https://saya6k.github.io/ha-sendblue/en/) · [한국어](https://saya6k.github.io/ha-sendblue/ko/)
 
 Send iMessages from Home Assistant to your family through [Sendblue](https://sendblue.com), and let them text back to control the house with Assist. No Mac or spare iPhone needed: Sendblue's own Apple hardware sends the messages.
 
@@ -12,7 +20,7 @@ Send iMessages from Home Assistant to your family through [Sendblue](https://sen
 
 ## Requirements
 
-- Home Assistant 2026.10 or newer.
+- Home Assistant 2026.10.4 or newer.
 - A public HTTPS address for Home Assistant, such as your Nabu Casa remote URL or your own domain. Sendblue posts incoming messages there. Sending works without it.
 - A Sendblue account. The free plan works and is what this integration is designed around.
 
@@ -188,13 +196,17 @@ logger:
 
 ## Development
 
+Open the repository in the devcontainer (the pinned Home Assistant image from `.devcontainer/devcontainer.json`), then:
+
 ```bash
-uv sync
-uv run pytest --cov=custom_components.sendblue
-uv run ruff check . && uv run ruff format --check .
+scripts/setup     # link the integration into a local config/
+scripts/develop   # run Home Assistant on port 8123
+scripts/test      # ruff + pytest
 ```
 
-[SPEC.md](SPEC.md) records the design and what was verified against the live Sendblue API; [PLAN.md](PLAN.md) is the implementation plan.
+Tests use the vendored Home Assistant test helpers in `tests/vendor/`. CI runs the same suite in the pinned image, plus HACS and hassfest validation.
+
+Releases are drafted by release-drafter from Conventional-Commit pull request titles (`feat:`, `fix:`, `chore:` …). Publishing a release attaches `sendblue.zip`, which HACS installs, with `manifest.json` set to the release version.
 
 The brand images in `custom_components/sendblue/brand/` are rendered from Sendblue's own logo. Sendblue is a trademark of its owner; this project is not affiliated with Sendblue.
 

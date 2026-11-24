@@ -8,7 +8,6 @@ from homeassistant.const import CONF_WEBHOOK_ID
 from homeassistant.core import HomeAssistant
 from homeassistant.core_config import async_process_ha_core_config
 from homeassistant.data_entry_flow import FlowResultType
-from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.sendblue.api import SendblueAuthError, SendblueError
 from custom_components.sendblue.const import (
@@ -19,6 +18,7 @@ from custom_components.sendblue.const import (
     CONF_WEBHOOK_SECRET,
     DOMAIN,
 )
+from tests.vendor.ha_common import MockConfigEntry
 
 USER_INPUT = {
     CONF_API_KEY_ID: "key-id",
@@ -60,14 +60,10 @@ def _entry(**data) -> MockConfigEntry:
 async def test_user_flow_creates_entry_with_generated_webhook(
     hass: HomeAssistant, get_lines
 ) -> None:
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     assert result["type"] is FlowResultType.FORM
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], USER_INPUT
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], USER_INPUT)
 
     assert result["type"] is FlowResultType.CREATE_ENTRY
     data = result["data"]
@@ -79,13 +75,9 @@ async def test_user_flow_creates_entry_with_generated_webhook(
 
 
 async def test_user_flow_suggests_external_url(hass: HomeAssistant) -> None:
-    await async_process_ha_core_config(
-        hass, {"external_url": "https://home.example.com"}
-    )
+    await async_process_ha_core_config(hass, {"external_url": "https://home.example.com"})
 
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
 
     schema = result["data_schema"].schema
     key = next(k for k in schema if k == CONF_WEBHOOK_BASE_URL)
@@ -105,28 +97,20 @@ async def test_user_flow_errors_then_recovers(
 ) -> None:
     get_lines.side_effect = side_effect
     get_lines.return_value = lines
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], USER_INPUT
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], USER_INPUT)
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"base": error}
 
     get_lines.side_effect = None
     get_lines.return_value = ["+15555550100"]
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], USER_INPUT
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], USER_INPUT)
     assert result["type"] is FlowResultType.CREATE_ENTRY
 
 
 async def test_user_flow_rejects_non_https_url(hass: HomeAssistant, get_lines) -> None:
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
@@ -137,17 +121,11 @@ async def test_user_flow_rejects_non_https_url(hass: HomeAssistant, get_lines) -
     get_lines.assert_not_called()
 
 
-async def test_user_flow_aborts_for_same_api_key(
-    hass: HomeAssistant, get_lines
-) -> None:
+async def test_user_flow_aborts_for_same_api_key(hass: HomeAssistant, get_lines) -> None:
     _entry().add_to_hass(hass)
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
 
-    result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], USER_INPUT
-    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], USER_INPUT)
 
     assert result["type"] is FlowResultType.ABORT
     assert result["reason"] == "already_configured"
@@ -177,12 +155,8 @@ async def test_reauth_updates_credentials(hass: HomeAssistant, get_lines) -> Non
     assert entry.data[CONF_WEBHOOK_ID] == "hook"
 
 
-async def test_reconfigure_updates_webhook_base_url(
-    hass: HomeAssistant, aioclient_mock
-) -> None:
-    aioclient_mock.delete(
-        "https://api.sendblue.com/api/account/webhooks", json={"status": "OK"}
-    )
+async def test_reconfigure_updates_webhook_base_url(hass: HomeAssistant, aioclient_mock) -> None:
+    aioclient_mock.delete("https://api.sendblue.com/api/account/webhooks", json={"status": "OK"})
     entry = _entry()
     entry.add_to_hass(hass)
     result = await entry.start_reconfigure_flow(hass)
@@ -207,9 +181,7 @@ async def test_reconfigure_updates_webhook_base_url(
 async def test_reconfigure_continues_when_old_webhook_cannot_be_deleted(
     hass: HomeAssistant, aioclient_mock
 ) -> None:
-    aioclient_mock.delete(
-        "https://api.sendblue.com/api/account/webhooks", status=500, json={}
-    )
+    aioclient_mock.delete("https://api.sendblue.com/api/account/webhooks", status=500, json={})
     entry = _entry()
     entry.add_to_hass(hass)
     result = await entry.start_reconfigure_flow(hass)
@@ -221,9 +193,7 @@ async def test_reconfigure_continues_when_old_webhook_cannot_be_deleted(
     assert result["reason"] == "reconfigure_successful"
 
 
-async def test_reconfigure_with_same_url_keeps_webhook(
-    hass: HomeAssistant, aioclient_mock
-) -> None:
+async def test_reconfigure_with_same_url_keeps_webhook(hass: HomeAssistant, aioclient_mock) -> None:
     entry = _entry()
     entry.add_to_hass(hass)
     result = await entry.start_reconfigure_flow(hass)
