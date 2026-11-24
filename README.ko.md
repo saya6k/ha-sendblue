@@ -64,6 +64,44 @@ data:
 
 iMessage에는 제목 칸이 없어서 `title`은 메시지 첫 줄로 들어갑니다. `media_url`은 외부에서 열리는 주소여야 하고 파일 확장자로 끝나야 합니다.
 
+### 메시지 효과
+
+`send_style`로 iMessage 기본 효과를 붙일 수 있습니다. 효과는 `sendblue.send_message`에서만 쓸 수 있고, `notify.send_message`에는 효과를 넣는 칸이 없습니다.
+
+**말풍선 효과** (말풍선이 움직임)
+
+| `send_style` | 효과 |
+|---|---|
+| `slam` | 말풍선이 화면에 쾅 내려꽂힙니다. |
+| `loud` | 말풍선이 커지며 흔들립니다. 소리치는 느낌입니다. |
+| `gentle` | 말풍선이 작고 조용하게 나타났다가 자리 잡습니다. |
+| `invisible` | 보이지 않는 잉크: 받는 사람이 문질러야 내용이 보입니다. 현관 비밀번호 같은 데 좋습니다. |
+
+**화면 효과** (대화 화면 전체)
+
+| `send_style` | 효과 |
+|---|---|
+| `celebration` | 모서리에서 반짝이가 터집니다. |
+| `fireworks` | 화면 가득 불꽃놀이가 터집니다. |
+| `shooting_star` | 별똥별이 화면을 가로지릅니다. |
+| `confetti` | 위에서 색종이가 떨어집니다. |
+| `balloons` | 풍선이 떠오릅니다. |
+| `love` | 말풍선에서 큰 하트가 떠오릅니다. |
+| `lasers` | 레이저가 화면을 훑습니다. |
+| `spotlight` | 화면이 어두워지고 메시지에 조명이 비칩니다. |
+| `echo` | 메시지가 화면 가득 반복됩니다. |
+
+```yaml
+action: sendblue.send_message
+target:
+  entity_id: notify.mom
+data:
+  message: "손님용 현관 비밀번호: 4821"
+  send_style: invisible
+```
+
+받는 기기에서 iMessage로 받아야 효과가 보입니다. SMS로 넘어가면 효과는 빠집니다. iPhone에서 **동작 줄이기**를 켰거나 **메시지 효과 자동 재생**을 끈 사람에게는 효과 없이 보이며, **다시 재생**을 눌러 볼 수 있습니다.
+
 ### 받은 메시지
 
 ```yaml

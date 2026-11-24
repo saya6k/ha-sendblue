@@ -102,7 +102,45 @@ Target one or more Sendblue `notify` entities.
 | `message` | yes | Text to send. |
 | `title` | no | Sent as the first line. |
 | `media_url` | no | Public HTTPS URL ending in the file extension (`.jpg`, `.png`, `.mp4`, …). |
-| `send_style` | no | One of `celebration`, `shooting_star`, `fireworks`, `lasers`, `love`, `confetti`, `balloons`, `spotlight`, `echo`, `invisible`, `gentle`, `loud`, `slam`. iMessage only. |
+| `send_style` | no | An iMessage effect; see [Message effects](#message-effects). |
+
+### Message effects
+
+`send_style` adds one of iMessage's built-in effects. Effects only work through `sendblue.send_message`; `notify.send_message` has no field for them.
+
+**Bubble effects** animate the message bubble:
+
+| `send_style` | Effect |
+|---|---|
+| `slam` | The bubble slams down onto the screen. |
+| `loud` | The bubble grows and shakes, as if shouted. |
+| `gentle` | The bubble appears small and quiet, then settles. |
+| `invisible` | Invisible ink: the text is hidden until the recipient swipes over it. Useful for door codes. |
+
+**Screen effects** fill the whole conversation:
+
+| `send_style` | Effect |
+|---|---|
+| `celebration` | Sparkles burst from the corner. |
+| `fireworks` | Fireworks across the screen. |
+| `shooting_star` | A shooting star crosses the screen. |
+| `confetti` | Confetti falls from the top. |
+| `balloons` | Balloons float up. |
+| `love` | A large heart rises from the bubble. |
+| `lasers` | Laser beams sweep the screen. |
+| `spotlight` | The screen dims and spotlights the message. |
+| `echo` | The message repeats across the screen. |
+
+```yaml
+action: sendblue.send_message
+target:
+  entity_id: notify.mom
+data:
+  message: "Guest door code: 4821"
+  send_style: invisible
+```
+
+Effects need iMessage on the receiving device. They are dropped if the message falls back to SMS, and recipients who turned on **Reduce Motion** or turned off **Auto-Play Message Effects** on their iPhone see the plain message (they can tap Replay).
 
 ### Event `sendblue_message_received`
 
