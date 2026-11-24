@@ -14,16 +14,10 @@ HOOK_URL = "https://ha.example.com/api/webhook/hook-id"
 
 
 def _calls(aioclient_mock, method: str, url: str) -> list:
-    return [
-        c
-        for c in aioclient_mock.mock_calls
-        if c[0].lower() == method and str(c[1]) == url
-    ]
+    return [c for c in aioclient_mock.mock_calls if c[0].lower() == method and str(c[1]) == url]
 
 
-async def test_setup_and_unload_entry(
-    hass: HomeAssistant, mock_entry, mock_api
-) -> None:
+async def test_setup_and_unload_entry(hass: HomeAssistant, mock_entry, mock_api) -> None:
     mock_entry.add_to_hass(hass)
 
     assert await hass.config_entries.async_setup(mock_entry.entry_id)

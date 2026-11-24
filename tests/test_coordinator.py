@@ -41,9 +41,7 @@ async def test_changed_line_raises_repair_issue(
 
     await hass.config_entries.async_setup(mock_entry.entry_id)
 
-    issue = issue_registry.async_get_issue(
-        DOMAIN, f"line_changed_{mock_entry.entry_id}"
-    )
+    issue = issue_registry.async_get_issue(DOMAIN, f"line_changed_{mock_entry.entry_id}")
     assert issue is not None
     assert issue.translation_placeholders == {"number": LINE}
     assert mock_entry.data[CONF_LAST_LINE] == LINE

@@ -19,9 +19,7 @@ async def _setup(hass: HomeAssistant, entry, aioclient_mock, contacts) -> None:
     await hass.async_block_till_done()
 
 
-async def test_verified_recipient_is_on(
-    hass: HomeAssistant, mock_entry, aioclient_mock
-) -> None:
+async def test_verified_recipient_is_on(hass: HomeAssistant, mock_entry, aioclient_mock) -> None:
     await _setup(
         hass,
         mock_entry,

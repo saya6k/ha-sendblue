@@ -1,4 +1,7 @@
 {
   "name": "Sendblue",
-  "homeassistant": "2026.10.0"
+  "render_readme": true,
+  "homeassistant": "2026.10.4",
+  "zip_release": true,
+  "filename": "sendblue.zip"
 }

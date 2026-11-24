@@ -4,9 +4,6 @@ import aiohttp
 import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from pytest_homeassistant_custom_component.test_util.aiohttp import (
-    AiohttpClientMocker,
-)
 
 from custom_components.sendblue.api import (
     BASE_URL,
@@ -17,15 +14,14 @@ from custom_components.sendblue.api import (
     SendblueFreePlanLimit,
     SendblueRateLimited,
 )
+from tests.vendor.aiohttp_mock import AiohttpClientMocker
 
 KEY_ID = "key-id"
 SECRET = "super-secret-value"
 
 
 @pytest.fixture
-async def client(
-    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
-) -> SendblueClient:
+async def client(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> SendblueClient:
     return SendblueClient(async_get_clientsession(hass), KEY_ID, SECRET)
 
 
@@ -64,9 +60,7 @@ async def test_send_message_omits_empty_optional_fields(
 async def test_send_message_includes_media_and_style(
     client: SendblueClient, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    aioclient_mock.post(
-        f"{BASE_URL}/api/send-message", status=202, json={"status": "QUEUED"}
-    )
+    aioclient_mock.post(f"{BASE_URL}/api/send-message", status=202, json={"status": "QUEUED"})
 
     await client.send_message(
         "+821012345678",

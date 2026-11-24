@@ -1,0 +1,21 @@
+[project]
+site_name = "Sendblue"
+site_url = "https://saya6k.github.io/ha-sendblue/en/"
+site_description = "Sendblue for Home Assistant — send iMessages to your family and answer their replies with Assist."
+docs_dir = "docs/en"
+site_dir = "site/en"
+repo_url = "https://github.com/saya6k/ha-sendblue"
+edit_uri = "edit/main/docs/en/"
+
+[project.theme]
+language = "en"
+
+[[project.extra.alternate]]
+name = "English"
+link = "https://saya6k.github.io/ha-sendblue/en/"
+lang = "en"
+
+[[project.extra.alternate]]
+name = "한국어"
+link = "https://saya6k.github.io/ha-sendblue/ko/"
+lang = "ko"

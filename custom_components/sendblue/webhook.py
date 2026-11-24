@@ -98,9 +98,7 @@ async def async_handle_webhook(
         if e.data[CONF_WEBHOOK_ID] == webhook_id
     )
     given = request.headers.get("sb-signing-secret", "")
-    if not hmac.compare_digest(
-        given.encode(), entry.data[CONF_WEBHOOK_SECRET].encode()
-    ):
+    if not hmac.compare_digest(given.encode(), entry.data[CONF_WEBHOOK_SECRET].encode()):
         return web.Response(status=401)
     try:
         payload = await request.json()
@@ -193,8 +191,7 @@ def _find_recipient(entry: ConfigEntry, sender: str) -> ConfigSubentry | None:
         (
             sub
             for sub in entry.subentries.values()
-            if sub.subentry_type == SUBENTRY_RECIPIENT
-            and sub.data[CONF_ADDRESS] == sender
+            if sub.subentry_type == SUBENTRY_RECIPIENT and sub.data[CONF_ADDRESS] == sender
         ),
         None,
     )

@@ -96,9 +96,7 @@ async def test_sendblue_action_sends_media_and_style(
     assert body["send_style"] == "celebration"
 
 
-async def test_sendblue_action_rejects_unknown_style(
-    hass: HomeAssistant, setup_entry
-) -> None:
+async def test_sendblue_action_rejects_unknown_style(hass: HomeAssistant, setup_entry) -> None:
     with pytest.raises(Exception, match="send_style"):
         await hass.services.async_call(
             DOMAIN,

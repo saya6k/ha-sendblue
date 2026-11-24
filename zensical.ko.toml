@@ -1,0 +1,21 @@
+[project]
+site_name = "Sendblue"
+site_url = "https://saya6k.github.io/ha-sendblue/ko/"
+site_description = "Home Assistant용 Sendblue — 가족에게 iMessage를 보내고, 답장에는 Assist로 응답합니다."
+docs_dir = "docs/ko"
+site_dir = "site/ko"
+repo_url = "https://github.com/saya6k/ha-sendblue"
+edit_uri = "edit/main/docs/ko/"
+
+[project.theme]
+language = "ko"
+
+[[project.extra.alternate]]
+name = "English"
+link = "https://saya6k.github.io/ha-sendblue/en/"
+lang = "en"
+
+[[project.extra.alternate]]
+name = "한국어"
+link = "https://saya6k.github.io/ha-sendblue/ko/"
+lang = "ko"

@@ -1,0 +1,56 @@
+# Prerelease (rc) track: drafts vX.Y.Z-rc.N. With
+# prerelease-identifier set, only the rc suffix increments between published
+# prereleases, so shipping several rcs never consumes stable version numbers
+# -- the stable track (release-drafter.yml) resolves from the last stable
+# release only, and the -rc.N suffix keeps the two tracks' tags from
+# colliding. Keep version-resolver/categories in sync with
+# release-drafter.yml. No autolabeler here: the stable track's job handles
+# PR labeling.
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+prerelease: true
+prerelease-identifier: "rc"
+# Migrated off the deprecated `version-resolver.*.labels` / `categories[*].labels`
+# fields (see https://github.com/release-drafter/release-drafter/pull/1558) -
+# version-resolver entries (no `title`) drive the semver bump only and aren't
+# shown in the release body; the titled entries below are the display
+# categories, both keyed off `when.labels` now instead of a bare `labels` list.
+categories:
+  # A `!` in a Conventional-Commit title (e.g. `feat!:`) gives the PR the
+  # `breaking` label instead of its type label. Below 1.0 a breaking change
+  # bumps the minor version like a feature; switch this entry to "major" once
+  # the integration reaches 1.0.
+  - type: "version-resolver"
+    semver-increment: "minor"
+    when:
+      labels: ["breaking"]
+  - type: "version-resolver"
+    semver-increment: "minor"
+    when:
+      labels: ["enhancement", "feature"]
+  - type: "version-resolver"
+    semver-increment: "patch"
+    when:
+      labels: ["bug", "fix", "chore", "dependencies", "ci"]
+  - type: "version-resolver"
+    semver-increment: "patch"
+  # A PR is listed under every category it matches, so a breaking PR carries
+  # only the `breaking` label (not its type label) to appear here alone.
+  - title: "⚠️ Breaking changes"
+    when:
+      labels: ["breaking"]
+  - title: "New Features"
+    when:
+      labels: ["enhancement", "feature"]
+  - title: "Bug Fixes"
+    when:
+      labels: ["bug", "fix"]
+  - title: "Maintenance"
+    when:
+      labels: ["chore", "dependencies", "ci"]
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

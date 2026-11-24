@@ -1,0 +1,21 @@
+# Tests use the vendored HA harness in tests/vendor/ and run inside the
+# pinned Home Assistant image (.devcontainer/devcontainer.json), which
+# already ships Home Assistant itself.
+homeassistant>=2026.10.4
+pytest>=9.0
+pytest-asyncio>=1.4
+
+# Pinned to Home Assistant 2026.10.4's own requirements for these components.
+# Runtime dependencies imported by HA's conversation component (a dependency).
+gazetteer-matcher==1.1.0
+hassil==3.12.1
+home-assistant-intents==2026.10.6
+
+# Imported when resolving the preferred Assist pipeline (after_dependency).
+ha-ffmpeg==3.2.2
+mutagen==1.48.1
+pymicro-vad==1.0.1
+pyspeex-noise==1.0.2
+
+# Read by tests/test_repo_docs.py.
+pyyaml
