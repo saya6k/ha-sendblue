@@ -33,7 +33,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv sync && uv run pytest`(테스트 0개 정상 종료), `uv run ruff check .`
   - Files: `pyproject.toml`, `custom_components/sendblue/{manifest.json,const.py,__init__.py}`, `hacs.json`, `LICENSE`, `.github/workflows/*.yml`
 
-- [ ] **T1. 수신자 주소 정규화** (T2와 병렬 가능)
+- [x] **T1. 수신자 주소 정규화** (T2와 병렬 가능)
   - Acceptance: `normalize_address(raw, default_region)` — `010-1234-5678`→`+821012345678`, `+82 010…`→`+8210…`, `+1 (555) 123-4567`→`+15551234567`, 이메일은 소문자화, 그 외 `ValueError`. 외부 라이브러리 없이 구현(국내 접두 `0` 규칙은 한국 등 국가번호 표로 한정).
   - Verify: `uv run pytest tests/test_phone.py`
   - Files: `custom_components/sendblue/phone.py`, `tests/test_phone.py`
