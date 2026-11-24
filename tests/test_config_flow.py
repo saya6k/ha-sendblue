@@ -31,7 +31,7 @@ USER_INPUT = {
 def get_lines():
     with patch(
         "custom_components.sendblue.config_flow.SendblueClient.get_lines",
-        new=AsyncMock(return_value=["+16173011689"]),
+        new=AsyncMock(return_value=["+15555550100"]),
     ) as mock:
         yield mock
 
@@ -116,7 +116,7 @@ async def test_user_flow_errors_then_recovers(
     assert result["errors"] == {"base": error}
 
     get_lines.side_effect = None
-    get_lines.return_value = ["+16173011689"]
+    get_lines.return_value = ["+15555550100"]
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], USER_INPUT
     )
@@ -259,11 +259,11 @@ async def test_add_recipient_normalizes_number_and_shows_line(
     hass: HomeAssistant,
 ) -> None:
     await async_process_ha_core_config(hass, {"country": "KR"})
-    entry = _entry(last_line="+16173011689")
+    entry = _entry(last_line="+15555550100")
     entry.add_to_hass(hass)
 
     result = await _start_recipient_flow(hass, entry)
-    assert result["description_placeholders"] == {"number": "+16173011689"}
+    assert result["description_placeholders"] == {"number": "+15555550100"}
 
     result = await hass.config_entries.subentries.async_configure(
         result["flow_id"],

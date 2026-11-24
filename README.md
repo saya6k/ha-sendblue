@@ -1,5 +1,7 @@
 # Sendblue for Home Assistant
 
+[한국어](README.ko.md)
+
 Send iMessages from Home Assistant to your family through [Sendblue](https://sendblue.com), and let them text back to control the house with Assist. No Mac or spare iPhone needed: Sendblue's own Apple hardware sends the messages.
 
 - One `notify` entity per person, so `notify.send_message` works in any automation.
@@ -80,6 +82,60 @@ triggers:
 
 Messages from recipients with **Allow Assist** turned on are passed to Assist, and the answer is texted back. Choose the conversation agent under the integration's **Configure** button. Assist can only control entities you have [exposed to Assist](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/). Each person keeps their conversation context for 5 minutes. The built-in agent is strict about wording; in Korean, for example, it understands "지금 몇 시야" but not "지금 몇시야?". An LLM-based agent is more forgiving.
 
+## Reference
+
+### Entities
+
+Each recipient gets a device with:
+
+| Entity | Description |
+|---|---|
+| `notify.<name>` | Sends to this person. |
+| `binary_sensor.<name>_verified` | On when Sendblue will deliver to this person. Unavailable if Sendblue doesn't report it (the free-plan contact list is read from an undocumented endpoint). |
+
+### Action `sendblue.send_message`
+
+Target one or more Sendblue `notify` entities.
+
+| Field | Required | Description |
+|---|---|---|
+| `message` | yes | Text to send. |
+| `title` | no | Sent as the first line. |
+| `media_url` | no | Public HTTPS URL ending in the file extension (`.jpg`, `.png`, `.mp4`, …). |
+| `send_style` | no | One of `celebration`, `shooting_star`, `fireworks`, `lasers`, `love`, `confetti`, `balloons`, `spotlight`, `echo`, `invisible`, `gentle`, `loud`, `slam`. iMessage only. |
+
+### Event `sendblue_message_received`
+
+| Key | Description |
+|---|---|
+| `entry_id` | The Sendblue config entry. |
+| `from_number` | Sender, in E.164 form. |
+| `content` | Message text (empty for media-only messages). |
+| `media_url` | Attachment URL, or empty. Sendblue expires it after 30 days. |
+| `service` | `iMessage`, `SMS` or `RCS`. |
+| `message_handle` | Sendblue's message ID. |
+| `recipient_subentry_id`, `recipient_name` | The matching recipient, or `null`. |
+
+Group messages and messages sent by the integration itself don't fire the event.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| "This recipient is not verified yet" | The person must text the Sendblue number from the exact number you registered. Check the **Verified** sensor. |
+| Verified sensor stays off after texting | The number stored in Sendblue must match what the phone sends. Korean numbers must be `+8210…`, not `+82010…`. Re-add the recipient with the local form (`010-…`). |
+| Replies don't arrive in Home Assistant | Look for the "cannot deliver incoming messages" repair. Check that the public URL opens from outside your network, then reload the integration. |
+| Assist answers "I didn't understand" | That is the conversation agent's answer. Try the same sentence in the Assist dialog, or pick another agent under **Configure**. |
+| Messages stop after a while | Your free shared number may have changed. Follow the repair notice and ask everyone to text the new number. |
+
+Enable debug logging with:
+
+```yaml
+logger:
+  logs:
+    custom_components.sendblue: debug
+```
+
 ## Security
 
 - Incoming requests must carry the secret Home Assistant generated during setup; anything else is rejected.
@@ -91,6 +147,18 @@ Messages from recipients with **Allow Assist** turned on are passed to Assist, a
 - Up to 10 verified contacts on a shared number.
 - A contact must text you first.
 - Before a contact replies, messages are limited (about 6 messages, 300 characters). The integration reports these errors in the automation trace.
+
+## Development
+
+```bash
+uv sync
+uv run pytest --cov=custom_components.sendblue
+uv run ruff check . && uv run ruff format --check .
+```
+
+[SPEC.md](SPEC.md) records the design and what was verified against the live Sendblue API; [PLAN.md](PLAN.md) is the implementation plan.
+
+The brand images in `custom_components/sendblue/brand/` are rendered from Sendblue's own logo. Sendblue is a trademark of its owner; this project is not affiliated with Sendblue.
 
 ## License
 

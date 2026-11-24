@@ -32,11 +32,11 @@ async def client(
 async def test_get_lines_sends_auth_headers_and_returns_numbers(
     client: SendblueClient, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    aioclient_mock.get(f"{BASE_URL}/api/lines", json={"numbers": ["+16173011689"]})
+    aioclient_mock.get(f"{BASE_URL}/api/lines", json={"numbers": ["+15555550100"]})
 
     lines = await client.get_lines()
 
-    assert lines == ["+16173011689"]
+    assert lines == ["+15555550100"]
     headers = aioclient_mock.mock_calls[0][3]
     assert headers["sb-api-key-id"] == KEY_ID
     assert headers["sb-api-secret-key"] == SECRET
@@ -51,12 +51,12 @@ async def test_send_message_omits_empty_optional_fields(
         json={"status": "QUEUED", "message_handle": "abc"},
     )
 
-    result = await client.send_message("+821012345678", "+16173011689", content="hi")
+    result = await client.send_message("+821012345678", "+15555550100", content="hi")
 
     assert result["message_handle"] == "abc"
     assert aioclient_mock.mock_calls[0][2] == {
         "number": "+821012345678",
-        "from_number": "+16173011689",
+        "from_number": "+15555550100",
         "content": "hi",
     }
 
@@ -70,7 +70,7 @@ async def test_send_message_includes_media_and_style(
 
     await client.send_message(
         "+821012345678",
-        "+16173011689",
+        "+15555550100",
         content="look",
         media_url="https://example.com/a.jpg",
         send_style="celebration",
@@ -105,7 +105,7 @@ async def test_unverified_contact_raises_specific_error(
     )
 
     with pytest.raises(SendblueContactNotVerified):
-        await client.send_message("+821012345678", "+16173011689", content="hi")
+        await client.send_message("+821012345678", "+15555550100", content="hi")
 
 
 @pytest.mark.parametrize(
@@ -122,7 +122,7 @@ async def test_rate_limits_raise_rate_limited(
     aioclient_mock.post(f"{BASE_URL}/api/send-message", status=status, json=body)
 
     with pytest.raises(SendblueRateLimited):
-        await client.send_message("+821012345678", "+16173011689", content="hi")
+        await client.send_message("+821012345678", "+15555550100", content="hi")
 
 
 @pytest.mark.parametrize("code", [4007, 4008, 4009])
@@ -136,7 +136,7 @@ async def test_free_plan_limits_raise_free_plan_limit(
     )
 
     with pytest.raises(SendblueFreePlanLimit):
-        await client.send_message("+821012345678", "+16173011689", content="hi")
+        await client.send_message("+821012345678", "+15555550100", content="hi")
 
 
 async def test_error_status_in_success_response_raises(
@@ -149,7 +149,7 @@ async def test_error_status_in_success_response_raises(
     )
 
     with pytest.raises(SendblueError, match="Message failed to send"):
-        await client.send_message("+821012345678", "+16173011689", content="hi")
+        await client.send_message("+821012345678", "+15555550100", content="hi")
 
 
 async def test_connection_error_raises_sendblue_error_without_secret(
@@ -217,7 +217,7 @@ async def test_shared_contacts_maps_number_to_verified(
         f"{BASE_URL}/accounts/shared-contacts",
         json={
             "status": "SUCCESS",
-            "sharedNumber": "+16173011689",
+            "sharedNumber": "+15555550100",
             "contacts": [
                 {"id": 1, "number": "+8201012345678", "verified": False},
                 {"id": 2, "number": "+821012345678", "verified": True},

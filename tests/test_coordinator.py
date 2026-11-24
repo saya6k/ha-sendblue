@@ -36,7 +36,7 @@ async def test_changed_line_raises_repair_issue(
 ) -> None:
     mock_entry.add_to_hass(hass)
     hass.config_entries.async_update_entry(
-        mock_entry, data={**mock_entry.data, CONF_LAST_LINE: "+16292925296"}
+        mock_entry, data={**mock_entry.data, CONF_LAST_LINE: "+15555550199"}
     )
 
     await hass.config_entries.async_setup(mock_entry.entry_id)

@@ -29,7 +29,7 @@ async def setup_homeassistant(hass: HomeAssistant) -> None:
     assert await async_setup_component(hass, "homeassistant", {})
 
 
-LINE = "+16173011689"
+LINE = "+15555550100"
 MOM = "+821012345678"
 
 
