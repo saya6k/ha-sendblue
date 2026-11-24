@@ -60,6 +60,8 @@ data:
   send_style: celebration
 ```
 
+iMessage has no subject line, so `title` is sent as the first line of the message.
+
 `media_url` must be publicly reachable and end in the file extension.
 
 ### Incoming messages
@@ -76,7 +78,7 @@ triggers:
 
 ### Assist
 
-Messages from recipients with **Allow Assist** turned on are passed to Assist, and the answer is texted back. Choose the conversation agent under the integration's **Configure** button. Assist can only control entities you have [exposed to Assist](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/). Each person keeps their conversation context for 5 minutes.
+Messages from recipients with **Allow Assist** turned on are passed to Assist, and the answer is texted back. Choose the conversation agent under the integration's **Configure** button. Assist can only control entities you have [exposed to Assist](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/). Each person keeps their conversation context for 5 minutes. The built-in agent is strict about wording; in Korean, for example, it understands "지금 몇 시야" but not "지금 몇시야?". An LLM-based agent is more forgiving.
 
 ## Security
 
