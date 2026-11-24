@@ -1,0 +1,56 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Sendblue",
+        "description": "Enter your Sendblue API credentials (`sendblue show-keys` or the dashboard) and the public HTTPS address Sendblue uses to reach Home Assistant.",
+        "data": {
+          "api_key_id": "API key ID",
+          "api_secret_key": "API secret key",
+          "webhook_base_url": "Public Home Assistant URL"
+        },
+        "data_description": {
+          "webhook_base_url": "For example your Nabu Casa remote URL or your own domain. Incoming messages are delivered to this address."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Sendblue",
+        "description": "Sendblue rejected the stored credentials. Enter a valid API key.",
+        "data": {
+          "api_key_id": "API key ID",
+          "api_secret_key": "API secret key"
+        }
+      },
+      "reconfigure": {
+        "title": "Change public URL",
+        "data": {
+          "webhook_base_url": "Public Home Assistant URL"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Sendblue rejected the API key.",
+      "cannot_connect": "Could not reach Sendblue.",
+      "no_lines": "This Sendblue account has no phone line yet.",
+      "invalid_url": "Enter an address that starts with https://."
+    },
+    "abort": {
+      "already_configured": "This API key is already configured.",
+      "reauth_successful": "Re-authentication was successful.",
+      "reconfigure_successful": "The public URL was updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Assist replies",
+        "data": {
+          "conversation_agent_id": "Conversation agent"
+        },
+        "data_description": {
+          "conversation_agent_id": "Agent that answers messages from recipients with Assist enabled."
+        }
+      }
+    }
+  }
+}

@@ -43,7 +43,7 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
   - Verify: `uv run pytest tests/test_api.py` (`aioclient_mock`으로 헤더·본문·오류 매핑)
   - Files: `custom_components/sendblue/api.py`, `tests/test_api.py`
 
-- [ ] **T3. Config flow + entry 수명주기**
+- [x] **T3. Config flow + entry 수명주기**
   - Acceptance: user step(키 2개 + `webhook_base_url`, `get_lines` 검증), `unique_id=api_key_id` 중복 중단, reauth, reconfigure(URL), options(`conversation_agent_id`). `async_setup_entry`가 클라이언트를 `runtime_data`에 넣고, `async_unload_entry` 정상 동작. `webhook_id`/`webhook_secret` 자동 생성.
   - Verify: `uv run pytest tests/test_config_flow.py tests/test_init.py` (config_flow 100% 커버리지)
   - Files: `config_flow.py`, `__init__.py`, `strings.json`, `tests/test_config_flow.py`, `tests/test_init.py`
