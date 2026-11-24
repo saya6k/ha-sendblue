@@ -90,12 +90,12 @@ api.py ───┼─> config_flow.py + __init__.py ─> coordinator.py ─┬�
 
 ### Phase D — 마무리
 
-- [x] **T10. 번역·문서** — hassfest는 로컬 실행 불가(arm64 Docker, 권한 정책)로 CI에서 확인 예정
+- [x] **T10. 번역·문서** — hassfest는 CI에서 통과
   - Acceptance: `translations/en.json`, `translations/ko.json`(strings.json과 키 일치), README(설치, Sendblue 무료 가입·번호 인증 절차·E.164 주의, 공유 번호 변경 시 재인증, Assist 노출 entity, 보안 주의).
   - Verify: hassfest 통과 (CI 또는 로컬 `docker`/`linux-test` 머신), `uv run pytest`
   - Files: `translations/en.json`, `translations/ko.json`, `README.md`
 
-- [ ] **T11. HA OS 실기 E2E** — *Ask first: GitHub 공개 저장소 생성·push*
+- [x] **T11. HA OS 실기 E2E** — SSH 수동 설치로 기준 2–10 확인, CI(hassfest·HACS·pytest) 통과로 기준 1 확인 — *Ask first: GitHub 공개 저장소 생성·push*
   - Acceptance: SPEC Success Criteria 1–10 체크리스트 전부 통과. 특히 9번(`sb-signing-secret` 헤더) 확인.
   - Verify: 수동 체크리스트 결과를 PR/이슈에 기록
   - Files: 없음 (발견 사항은 SPEC 실측 결과에 추가)
