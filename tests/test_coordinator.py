@@ -108,3 +108,17 @@ async def test_same_line_on_later_refresh_raises_no_issue(
 
     assert len(issue_registry.issues) == 0
     assert mock_entry.data[CONF_LAST_LINE] == LINE
+
+
+async def test_malformed_contacts_keeps_entry_working(
+    hass: HomeAssistant, mock_entry, aioclient_mock
+) -> None:
+    aioclient_mock.get(f"{BASE_URL}/api/lines", json={"numbers": [LINE]})
+    aioclient_mock.get(f"{BASE_URL}/accounts/shared-contacts", json={"contacts": [{"x": 1}]})
+    mock_webhooks(aioclient_mock)
+    mock_entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(mock_entry.entry_id)
+
+    assert mock_entry.state is ConfigEntryState.LOADED
+    assert mock_entry.runtime_data.coordinator.data.verified is None

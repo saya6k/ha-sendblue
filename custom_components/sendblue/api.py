@@ -63,8 +63,11 @@ class SendblueClient:
 
     async def list_webhook_urls(self) -> list[str]:
         data = await self._request("GET", "/api/account/webhooks")
-        hooks = data.get("webhooks", {}).get("receive", [])
-        return [h["url"] if isinstance(h, dict) else h for h in hooks]
+        try:
+            hooks = data.get("webhooks", {}).get("receive", [])
+            return [h["url"] if isinstance(h, dict) else h for h in hooks]
+        except (AttributeError, KeyError, TypeError) as err:
+            raise SendblueError("Unexpected webhook list from Sendblue") from err
 
     async def add_webhook(self, url: str, secret: str) -> None:
         await self._request(
@@ -84,7 +87,10 @@ class SendblueClient:
         Undocumented endpoint used by Sendblue's own CLI.
         """
         data = await self._request("GET", "/accounts/shared-contacts")
-        return {c["number"]: bool(c.get("verified")) for c in data.get("contacts", [])}
+        try:
+            return {c["number"]: bool(c.get("verified")) for c in data.get("contacts", [])}
+        except (AttributeError, KeyError, TypeError) as err:
+            raise SendblueError("Unexpected shared-contacts response from Sendblue") from err
 
     async def _request(
         self, method: str, path: str, body: dict[str, Any] | None = None

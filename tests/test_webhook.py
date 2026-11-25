@@ -8,6 +8,7 @@ from homeassistant.components.conversation import ConversationResult
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import intent
 
+from custom_components.sendblue.api import SendblueClient
 from tests.vendor.ha_common import async_capture_events
 
 from .conftest import LINE, MOM, mock_webhooks
@@ -110,6 +111,29 @@ async def test_outbound_and_group_messages_are_ignored(
     assert events == []
 
 
+async def test_message_during_setup_is_handled(
+    hass: HomeAssistant, mock_entry, mock_api, hass_client_no_auth
+) -> None:
+    """A redelivery that lands while setup still talks to Sendblue is not lost."""
+    events = async_capture_events(hass, EVENT)
+    mock_entry.add_to_hass(hass)
+    statuses = []
+    list_urls = SendblueClient.list_webhook_urls
+
+    async def post_then_list(self):
+        client = await hass_client_no_auth()
+        resp = await client.post(URL, json=_payload(), headers=HEADERS)
+        statuses.append(resp.status)
+        return await list_urls(self)
+
+    with patch.object(SendblueClient, "list_webhook_urls", post_then_list):
+        await hass.config_entries.async_setup(mock_entry.entry_id)
+        await hass.async_block_till_done()
+
+    assert statuses == [200]
+    assert len(events) == 1
+
+
 async def test_redelivered_message_is_handled_once(hass: HomeAssistant, client) -> None:
     events = async_capture_events(hass, EVENT)
 
@@ -172,6 +196,15 @@ async def test_assist_reply_is_sent_back_to_sender(
     assert _replies(mock_api) == [{"number": MOM, "from_number": LINE, "content": "Lights are off"}]
 
 
+async def test_assist_reply_comes_from_the_line_that_was_texted(
+    hass: HomeAssistant, assist_client, mock_api, converse
+) -> None:
+    await assist_client.post(URL, json=_payload(to_number="+15555550177"), headers=HEADERS)
+    await hass.async_block_till_done()
+
+    assert _replies(mock_api)[0]["from_number"] == "+15555550177"
+
+
 async def test_assist_uses_configured_agent(
     hass: HomeAssistant, assist_client, mock_entry, converse
 ) -> None:
@@ -199,9 +232,11 @@ async def test_assist_is_not_run_when_disabled_for_recipient(
     [
         {"from_number": "+15550001111"},
         {"content": "  ", "media_url": "https://cdn.example/a.jpg"},
+        {"service": "SMS"},
+        {"service": "RCS"},
     ],
 )
-async def test_assist_is_not_run_for_unknown_sender_or_empty_text(
+async def test_assist_is_not_run_for_unknown_sender_empty_text_or_non_imessage(
     hass: HomeAssistant, assist_client, converse, overrides
 ) -> None:
     await assist_client.post(URL, json=_payload(**overrides), headers=HEADERS)
