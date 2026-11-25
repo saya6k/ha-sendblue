@@ -7,6 +7,8 @@ from pathlib import Path
 
 import yaml
 
+from custom_components.sendblue.const import SEND_STYLES
+
 ROOT = Path(__file__).parent.parent
 SERVICES_YAML = ROOT / "custom_components" / "sendblue" / "services.yaml"
 
@@ -33,3 +35,10 @@ def test_docs_document_every_service() -> None:
         text = (ROOT / page).read_text(encoding="utf-8")
         for name in services:
             assert f"sendblue.{name}" in text, f"{page} missing sendblue.{name}"
+
+
+def test_send_styles_match_services_yaml() -> None:
+    """The send_style selector offers exactly the styles the action schema accepts."""
+    services = yaml.safe_load(SERVICES_YAML.read_text(encoding="utf-8"))
+    options = services["send_message"]["fields"]["send_style"]["selector"]["select"]["options"]
+    assert options == SEND_STYLES
