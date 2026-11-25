@@ -227,3 +227,21 @@ async def test_shared_contacts_maps_number_to_verified(
         "+821012345678": True,
         "+821099998888": False,
     }
+
+
+@pytest.mark.parametrize(
+    ("path", "body", "method"),
+    [
+        ("/accounts/shared-contacts", {"contacts": [{"id": 1}]}, "get_shared_contacts"),
+        ("/accounts/shared-contacts", {"contacts": "none"}, "get_shared_contacts"),
+        ("/api/account/webhooks", {"webhooks": [{"url": "x"}]}, "list_webhook_urls"),
+        ("/api/account/webhooks", {"webhooks": {"receive": [{}]}}, "list_webhook_urls"),
+    ],
+)
+async def test_unexpected_response_shape_raises_sendblue_error(
+    client: SendblueClient, aioclient_mock: AiohttpClientMocker, path, body, method
+) -> None:
+    aioclient_mock.get(f"{BASE_URL}{path}", json=body)
+
+    with pytest.raises(SendblueError):
+        await getattr(client, method)()

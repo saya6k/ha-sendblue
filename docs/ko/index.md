@@ -118,7 +118,7 @@ triggers:
 
 ### Assist
 
-**Assist 허용**이 켜진 사람의 메시지는 Assist로 전달되고, 답이 문자로 돌아갑니다. 기본으로 선호하는 Assist 파이프라인의 대화 에이전트와 언어를 쓰며, 통합구성요소의 **구성**에서 다른 에이전트를 고를 수 있습니다. Assist는 [Assist에 노출한](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/) entity만 제어할 수 있습니다. 대화 맥락은 사람별로 5분 동안 유지됩니다.
+**Assist 허용**이 켜진 사람이 보낸 iMessage는 Assist로 전달되고, 답은 그 사람이 메시지를 보낸 번호에서 돌아갑니다. 기본으로 선호하는 Assist 파이프라인의 대화 에이전트와 언어를 쓰며, 통합구성요소의 **구성**에서 다른 에이전트를 고를 수 있습니다. Assist는 [Assist에 노출한](https://www.home-assistant.io/voice_control/voice_remote_expose_devices/) entity만 제어할 수 있습니다. 대화 맥락은 사람별로 5분 동안 유지됩니다.
 
 기본 대화 에이전트는 표현에 엄격합니다. 예를 들어 "지금 몇 시야"는 알아듣지만 "지금 몇시야?"는 못 알아듣습니다. LLM 기반 에이전트가 더 유연합니다.
 
@@ -144,6 +144,7 @@ logger:
 
 - 들어오는 요청은 설정할 때 Home Assistant가 만든 secret이 있어야 하며, 없으면 거부합니다.
 - 수신자가 아니거나 Assist가 허용되지 않은 사람의 메시지는 이벤트만 발생하고 Assist에는 전달되지 않습니다.
+- SMS와 RCS 메시지는 SMS 발신번호를 위조할 수 있으므로, Assist가 허용된 수신자가 보냈더라도 이벤트만 발생합니다.
 - 메시지는 Sendblue 서버를 거칩니다. 제3자에게 맡기기 어려운 내용은 보내지 마세요.
 
 ## 무료 플랜 제한

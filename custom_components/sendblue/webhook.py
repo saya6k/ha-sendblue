@@ -2,6 +2,7 @@
 
 import hmac
 import logging
+from functools import partial
 
 from aiohttp import web
 from homeassistant.components import assist_pipeline, conversation, webhook
@@ -48,7 +49,9 @@ async def async_setup_webhook(hass: HomeAssistant, entry: ConfigEntry) -> None:
         DOMAIN,
         "Sendblue",
         entry.data[CONF_WEBHOOK_ID],
-        async_handle_webhook,
+        # Bound to the entry: it is not "loaded" yet while setup below runs,
+        # and messages already arrive then.
+        partial(async_handle_webhook, entry),
         local_only=False,
         allowed_methods=["POST"],
     )
@@ -90,13 +93,8 @@ async def async_delete_remote_webhook(
 
 
 async def async_handle_webhook(
-    hass: HomeAssistant, webhook_id: str, request: web.Request
+    entry: ConfigEntry, hass: HomeAssistant, webhook_id: str, request: web.Request
 ) -> web.Response:
-    entry = next(
-        e
-        for e in hass.config_entries.async_loaded_entries(DOMAIN)
-        if e.data[CONF_WEBHOOK_ID] == webhook_id
-    )
     given = request.headers.get("sb-signing-secret", "")
     if not hmac.compare_digest(given.encode(), entry.data[CONF_WEBHOOK_SECRET].encode()):
         return web.Response(status=401)
@@ -132,17 +130,25 @@ async def async_handle_webhook(
             "recipient_name": recipient.title if recipient else None,
         },
     )
-    # Only allowlisted recipients may reach Assist; reply after acking so
-    # a slow agent never trips Sendblue's 45 s timeout and retries.
-    if recipient and recipient.data[CONF_ASSIST_ENABLED] and content.strip():
+    # Only allowlisted recipients may reach Assist, and only over iMessage:
+    # SMS sender numbers can be spoofed. Reply after acking so a slow agent
+    # never trips Sendblue's 45 s timeout and retries.
+    if (
+        recipient
+        and recipient.data[CONF_ASSIST_ENABLED]
+        and payload.get("service") == "iMessage"
+        and content.strip()
+    ):
+        # Answer from the line that was texted, so the reply stays in its thread.
+        line = str(payload.get("to_number") or "")
         entry.async_create_background_task(
-            hass, _async_assist_reply(hass, entry, sender, content), "sendblue_assist"
+            hass, _async_assist_reply(hass, entry, sender, line, content), "sendblue_assist"
         )
     return web.Response(status=200)
 
 
 async def _async_assist_reply(
-    hass: HomeAssistant, entry: ConfigEntry, sender: str, text: str
+    hass: HomeAssistant, entry: ConfigEntry, sender: str, line: str, text: str
 ) -> None:
     agent_id, language = _resolve_agent(hass, entry)
     try:
@@ -164,7 +170,7 @@ async def _async_assist_reply(
     runtime = entry.runtime_data
     try:
         await runtime.client.send_message(
-            sender, runtime.coordinator.data.from_number, content=speech
+            sender, line or runtime.coordinator.data.from_number, content=speech
         )
     except SendblueError as err:
         _LOGGER.warning("Cannot send Assist reply: %s", err)
