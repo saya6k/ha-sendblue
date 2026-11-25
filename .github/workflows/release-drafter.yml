@@ -2,8 +2,7 @@ name: Release Drafter
 
 # Standalone (not a workflow_call reusable): needs its own pull_request_target
 # trigger for autolabeling, which reusable workflows invoked via `uses:` from
-# ci.yml cannot receive. Plus a manifest-version-sync job — HACS reads the
-# version from manifest.json, so it must track the resolved release version.
+# ci.yml cannot receive.
 # yamllint disable-line rule:truthy
 on:
   push:

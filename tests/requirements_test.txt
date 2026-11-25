@@ -4,6 +4,7 @@
 homeassistant>=2026.10.4
 pytest>=9.0
 pytest-asyncio>=1.4
+ruff==0.17.6
 
 # Pinned to Home Assistant 2026.10.4's own requirements for these components.
 # Runtime dependencies imported by HA's conversation component (a dependency).
