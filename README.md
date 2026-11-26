@@ -24,10 +24,12 @@ Send iMessages from Home Assistant to your family through [Sendblue](https://sen
 - A public HTTPS address for Home Assistant, such as your Nabu Casa remote URL or your own domain. Sendblue posts incoming messages there. Sending works without it.
 - A Sendblue account. The free plan works and is what this integration is designed around.
 
+<!-- ha-marketplace:exclude-start -->
 ## Install
 
 1. In HACS, open **Custom repositories**, add `https://github.com/saya6k/ha-sendblue` as an **Integration**, then install **Sendblue**.
 2. Restart Home Assistant.
+<!-- ha-marketplace:exclude-end -->
 
 ## Set up Sendblue
 
@@ -195,6 +197,7 @@ logger:
 - A contact must text you first.
 - Before a contact replies, messages are limited (about 6 messages, 300 characters). The integration reports these errors in the automation trace.
 
+<!-- ha-marketplace:exclude-start -->
 ## Development
 
 Open the repository in the devcontainer (the pinned Home Assistant image from `.devcontainer/devcontainer.json`), then:
@@ -210,6 +213,7 @@ Tests use the vendored Home Assistant test helpers in `tests/vendor/`. CI runs t
 Releases are drafted by release-drafter from Conventional-Commit pull request titles (`feat:`, `fix:`, `chore:` …). Publishing a release attaches `sendblue.zip`, which HACS installs, with `manifest.json` set to the release version.
 
 The brand images in `custom_components/sendblue/brand/` are rendered from Sendblue's own logo. Sendblue is a trademark of its owner; this project is not affiliated with Sendblue.
+<!-- ha-marketplace:exclude-end -->
 
 ## License
 
